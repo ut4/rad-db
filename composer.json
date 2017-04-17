@@ -1,0 +1,19 @@
+{
+    "name": "rad/db",
+    "type": "library",
+    "require": {
+        "aura/sqlquery": "^2.7.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rad\\Db\\": "src/"
+        }
+    },
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "ut4",
+            "email": "ut4.l@live.fi"
+        }
+    ]
+}
