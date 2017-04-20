@@ -26,9 +26,10 @@ class Connection
      */
     public function insert(InsertInterface $insertQuery): int
     {
-        var_dump($q->getStatement());
-        var_dump($q->getBindValues());
-        return 1;
+        $pdoStatement = $this->pdo->prepare($insertQuery->getStatement());
+        $pdoStatement->execute($insertQuery->getBindValues());
+        $this->rowCount = $pdoStatement->rowCount();
+        return $this->rowCount > 0 ? (int) $this->lastInsertId() : 0;
     }
 
     public function fetchAll(SelectInterface $q): array
@@ -50,5 +51,13 @@ class Connection
         var_dump($q->getStatement());
         var_dump($q->getBindValues());
         return 1;
+    }
+
+    /**
+     * @return string
+     */
+    public function lastInsertId()
+    {
+        return $this->pdo->lastInsertId();
     }
 }
