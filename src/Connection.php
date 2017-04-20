@@ -56,11 +56,15 @@ class Connection
         return $pdoStatement->rowCount();
     }
 
-    public function delete(DeleteInterface $q): int
+    /**
+     * @param DeleteInterface $deleteQuery
+     * @return int
+     */
+    public function delete(DeleteInterface $deleteQuery): int
     {
-        var_dump($q->getStatement());
-        var_dump($q->getBindValues());
-        return 1;
+        $pdoStatement = $this->pdo->prepare($deleteQuery->getStatement());
+        $pdoStatement->execute($deleteQuery->getBindValues());
+        return $pdoStatement->rowCount();
     }
 
     /**
