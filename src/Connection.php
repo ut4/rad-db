@@ -45,11 +45,15 @@ class Connection
         return $pdoStatement->fetchAll($this->fetchMode);
     }
 
-    public function update(UpdateInterface $q): int
+    /**
+     * @param UpdateInterface $updateQuery
+     * @return int
+     */
+    public function update(UpdateInterface $updateQuery): int
     {
-        var_dump($q->getStatement());
-        var_dump($q->getBindValues());
-        return 1;
+        $pdoStatement = $this->pdo->prepare($updateQuery->getStatement());
+        $pdoStatement->execute($updateQuery->getBindValues());
+        return $pdoStatement->rowCount();
     }
 
     public function delete(DeleteInterface $q): int
