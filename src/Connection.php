@@ -10,7 +10,8 @@ use Aura\SqlQuery\Common\DeleteInterface;
 
 class Connection
 {
-    private $pdo;
+    protected $pdo;
+    protected $fetchMode;
 
     /**
      * @param PDO $pdo
@@ -18,6 +19,7 @@ class Connection
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
+        $this->fetchMode = PDO::FETCH_ASSOC;
     }
 
     /**
@@ -32,11 +34,15 @@ class Connection
         return $this->rowCount > 0 ? (int) $this->lastInsertId() : 0;
     }
 
-    public function fetchAll(SelectInterface $q): array
+    /**
+     * @param SelectInterface $selectQuery
+     * @return array[]|array
+     */
+    public function fetchAll(SelectInterface $selectQuery): array
     {
-        var_dump($q->getStatement());
-        var_dump($q->getBindValues());
-        return [];
+        $pdoStatement = $this->pdo->prepare($selectQuery->getStatement());
+        $pdoStatement->execute($selectQuery->getBindValues());
+        return $pdoStatement->fetchAll($this->fetchMode);
     }
 
     public function update(UpdateInterface $q): int
