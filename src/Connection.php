@@ -36,13 +36,17 @@ class Connection
 
     /**
      * @param SelectInterface $selectQuery
+     * @param array $fetchArgs = null
      * @return array[]|array
      */
-    public function fetchAll(SelectInterface $selectQuery): array
-    {
+    public function fetchAll(
+        SelectInterface $selectQuery,
+        array $fetchArgs = null
+    ): array {
         $pdoStatement = $this->pdo->prepare($selectQuery->getStatement());
         $pdoStatement->execute($selectQuery->getBindValues());
-        return $pdoStatement->fetchAll($this->fetchMode);
+        $rows = $pdoStatement->fetchAll(... $fetchArgs ?? [$this->fetchMode]);
+        return is_array($rows) ? $rows : [];
     }
 
     /**

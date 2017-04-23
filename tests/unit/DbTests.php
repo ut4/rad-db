@@ -37,7 +37,7 @@ class DbTest extends TestCase
         );
     }
 
-    public function selectAllCallsConnection()
+    public function testSelectAllCallsConnection()
     {
         $selectAllQuery = $this->createMock(SelectInterface::class);
         $mockValueFromConnection = [1, 2];
@@ -55,22 +55,42 @@ class DbTest extends TestCase
         );
     }
 
-    public function selectOneCallsConnectionAndReturnsFirstItemFromResults()
+    public function testSelectAllCallsConnectionWithProvidedFetchArgs()
+    {
+        $selectAllQuery = $this->createMock(SelectInterface::class);
+        $fetchArgs = ['PDO::FETCH_FOO'];
+        $mockValueFromConnection = [1, 2];
+        $this->mockConn->expects($this->once())
+            ->method('fetchAll')
+            ->with($selectAllQuery, $fetchArgs)
+            ->willReturn($mockValueFromConnection);
+        // Execute
+        $this->db->selectAll($selectAllQuery, $fetchArgs);
+    }
+
+    public function testSelectOneCallsConnectionAndReturnsFirstItemFromResults()
     {
         $selectOneQuery = $this->createMock(SelectInterface::class);
-        $mockValueFromConnection = [1, 2];
+        $mockValueFromConnection = [['col' => 'val'], ['col' => 'val2']];
         $this->mockConn->expects($this->once())
             ->method('fetchAll')
             ->with($selectOneQuery)
             ->willReturn($mockValueFromConnection);
         // Execute
-        $result = $this->db->selectAll($selectOneQuery);
+        $result = $this->db->selectOne($selectOneQuery);
         // Assert
         $this->assertEquals(
             $result,
             $mockValueFromConnection[0],
             'Should return first value from the array returned by <connection>'
         );
+    }
+
+    public function testSelectOneReturnsEmptyArrayIfConnectionReturnsEmptyResults()
+    {
+        $this->mockConn->expects($this->once())->method('fetchAll')->willReturn([]);
+        $result = $this->db->selectOne($this->createMock(SelectInterface::class));
+        $this->assertEquals([], $result);
     }
 
     public function testUpdateCallsConnection()

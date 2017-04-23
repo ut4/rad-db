@@ -27,20 +27,26 @@ class Db
 
     /**
      * @param SelectInterface $selectQuery
+     * @param $fetchArgs = null
      * @return array[]
      */
-    public function selectAll(SelectInterface $selectQuery): array
-    {
-        return $this->conn->fetchAll($selectQuery);
+    public function selectAll(
+        SelectInterface $selectQuery,
+        $fetchArgs = null
+    ): array {
+        return $this->conn->fetchAll($selectQuery, $fetchArgs);
     }
 
     /**
      * @param SelectInterface $selectQuery
+     * @param $fetchArgs = null
      * @return array
      */
-    public function selectOne(SelectInterface $selectQuery): array
-    {
-        return $this->selectAll($selectQuery)[0];
+    public function selectOne(
+        SelectInterface $selectQuery,
+        $fetchArgs = null
+    ): array {
+        return $this->selectAll($selectQuery, $fetchArgs)[0] ?? [];
     }
 
     /**

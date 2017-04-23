@@ -2,6 +2,7 @@
 
 namespace Rad\Db;
 
+use PDO;
 use PDOStatement;
 use Aura\SqlQuery\Common\Select;
 
@@ -38,6 +39,40 @@ trait ConnectionSelectTests
             $result,
             $mockResultsFromPdo,
             'Should return the results'
+        );
+    }
+
+    public function testFetchAllUsesProvidedFetchArgs()
+    {
+        // Prepare
+        $fetchArgs = [PDO::FETCH_CLASS, 'Foo'];
+        $mockPreparedStatement = $this->createMock(PDOStatement::class);
+        $mockPreparedStatement
+            ->expects($this->once())
+            ->method('fetchAll')
+            ->with($fetchArgs[0], $fetchArgs[1])
+            ->willReturn([]);
+        $this->mockPdo
+            ->expects($this->once())
+            ->method('prepare')
+            ->willReturn($mockPreparedStatement);
+        // Execute & Assert
+        $selectQ = $this->createMock(Select::class);
+        $this->connection->fetchAll($selectQ, $fetchArgs);
+    }
+
+    public function testFetchAllReturnsEmptyArrayIfStatementFails()
+    {
+        // Prepare
+        $mockPreparedStatement = $this->createMock(PDOStatement::class);
+        $mockPreparedStatement->method('fetchAll')->willReturn(false);
+        $this->mockPdo->method('prepare')->willReturn($mockPreparedStatement);
+        // Execute & Assert
+        $selectQ = $this->createMock(Select::class);
+        $result = $this->connection->fetchAll($selectQ);
+        $this->assertEquals(
+            [],
+            $result
         );
     }
 }
