@@ -4,10 +4,6 @@ namespace Rad\Db;
 
 use PDO;
 use PHPUnit\Framework\TestCase;
-include_once __dir__ . '/ConnectionInsertTests.php';
-include_once __dir__ . '/ConnectionSelectTests.php';
-include_once __dir__ . '/ConnectionUpdateTests.php';
-include_once __dir__ . '/ConnectionDeleteTests.php';
 
 class ConnectionTest extends TestCase
 {

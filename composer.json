@@ -6,7 +6,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Rad\\Db\\": "src/"
+            "Rad\\Db\\": [
+                "src/",
+                "tests/unit",
+                "tests/integration"
+            ]
         }
     },
     "license": "BSD-2-Clause",
