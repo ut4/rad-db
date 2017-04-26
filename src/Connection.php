@@ -50,6 +50,21 @@ class Connection
     }
 
     /**
+     * @param SelectInterface $selectQuery
+     * @param array $fetchArgs = null
+     * @return array
+     */
+    public function fetch(
+        SelectInterface $selectQuery,
+        array $fetchArgs = null
+    ): array {
+        $pdoStatement = $this->pdo->prepare($selectQuery->getStatement());
+        $pdoStatement->execute($selectQuery->getBindValues());
+        $rows = $pdoStatement->fetch(... $fetchArgs ?? [$this->fetchMode]);
+        return is_array($rows) ? $rows : [];
+    }
+
+    /**
      * @param UpdateInterface $updateQuery
      * @return int
      */

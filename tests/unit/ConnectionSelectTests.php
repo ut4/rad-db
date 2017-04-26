@@ -10,6 +10,44 @@ trait ConnectionSelectTests
 {
     public function testFetchAllRunsPreparedStatementAndReturnsTheResults()
     {
+        $this->assertSuccefulFetchReturnsTheResultsFromStatement('fetchAll');
+    }
+
+    public function testFetchAllUsesProvidedFetchArgs()
+    {
+        $this->assertFetchAreCalledWithFetchArgs(
+            [PDO::FETCH_CLASS, 'Foo'],
+            'fetchAll'
+        );
+    }
+
+    public function testFetchAllReturnsEmptyArrayIfStatementFails()
+    {
+        $this->assertFailedFetchReturnsEmptyArray('fetchAll');
+    }
+
+    public function testFetchRunsPreparedStatementAndReturnsTheResult()
+    {
+        $this->assertSuccefulFetchReturnsTheResultsFromStatement('fetch');
+    }
+
+    public function testFetchUsesProvidedFetchArgs()
+    {
+
+        $this->assertFetchAreCalledWithFetchArgs(
+            [PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT],
+            'fetch'
+        );
+    }
+
+    public function testFetchReturnsEmptyArrayIfStatementFails()
+    {
+        $this->assertFailedFetchReturnsEmptyArray('fetch');
+    }
+
+    private function assertSuccefulFetchReturnsTheResultsFromStatement(
+        string $pdoFetchMethod
+    ) {
         // Prepare
         $expectedPrepareQuery = '<sql>';
         $expectedPrepareBindValues = '<data>';
@@ -17,7 +55,7 @@ trait ConnectionSelectTests
         $mockPreparedStatement = $this->createMock(PDOStatement::class);
         $mockPreparedStatement
             ->expects($this->once())
-            ->method('fetchAll')
+            ->method($pdoFetchMethod)
             ->willReturn($mockResultsFromPdo);
         $mockPreparedStatement
             ->expects($this->once())
@@ -33,7 +71,7 @@ trait ConnectionSelectTests
         $selectQ = $this->createMock(Select::class);
         $selectQ->method('getStatement')->willReturn($expectedPrepareQuery);
         $selectQ->method('getBindValues')->willReturn($expectedPrepareBindValues);
-        $result = $this->connection->fetchAll($selectQ);
+        $result = $this->connection->$pdoFetchMethod($selectQ);
         // Assert
         $this->assertEquals(
             $mockResultsFromPdo,
@@ -42,15 +80,16 @@ trait ConnectionSelectTests
         );
     }
 
-    public function testFetchAllUsesProvidedFetchArgs()
-    {
+    private function assertFetchAreCalledWithFetchArgs(
+        array $fetchArgs,
+        string $pdoFetchMethod
+    ) {
         // Prepare
-        $fetchArgs = [PDO::FETCH_CLASS, 'Foo'];
         $mockPreparedStatement = $this->createMock(PDOStatement::class);
         $mockPreparedStatement
             ->expects($this->once())
-            ->method('fetchAll')
-            ->with($fetchArgs[0], $fetchArgs[1])
+            ->method($pdoFetchMethod)
+            ->with(... $fetchArgs)
             ->willReturn([]);
         $this->mockPdo
             ->expects($this->once())
@@ -58,21 +97,18 @@ trait ConnectionSelectTests
             ->willReturn($mockPreparedStatement);
         // Execute & Assert
         $selectQ = $this->createMock(Select::class);
-        $this->connection->fetchAll($selectQ, $fetchArgs);
+        $this->connection->$pdoFetchMethod($selectQ, $fetchArgs);
     }
 
-    public function testFetchAllReturnsEmptyArrayIfStatementFails()
+    private function assertFailedFetchReturnsEmptyArray(string $pdoFetchMethod)
     {
         // Prepare
         $mockPreparedStatement = $this->createMock(PDOStatement::class);
-        $mockPreparedStatement->method('fetchAll')->willReturn(false);
+        $mockPreparedStatement->method($pdoFetchMethod)->willReturn(false);
         $this->mockPdo->method('prepare')->willReturn($mockPreparedStatement);
         // Execute & Assert
         $selectQ = $this->createMock(Select::class);
-        $result = $this->connection->fetchAll($selectQ);
-        $this->assertEquals(
-            [],
-            $result
-        );
+        $result = $this->connection->$pdoFetchMethod($selectQ);
+        $this->assertEquals([], $result);
     }
 }
