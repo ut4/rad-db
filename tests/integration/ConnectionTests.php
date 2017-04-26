@@ -2,32 +2,17 @@
 
 namespace Rad\Db;
 
-use PDO;
-use Aura\SqlQuery\QueryFactory;
-use PHPUnit\Framework\TestCase;
-
 /**
  * Tests that Connection->pdo plays along with Aura\SqlQuery\QueryInterfaces
  */
-class ConnectionTests extends TestCase
+class ConnectionTests extends InMemoryPDOTestCase
 {
-    private $pdo;
-    private $connection;
-    private $queryFactory;
-
     /**
      * @before
      */
     public function beforeEach()
     {
-        $this->pdo = new PDO('sqlite::memory:');
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->query('CREATE TABLE test_table (' .
-            'id INTEGER PRIMARY KEY AUTOINCREMENT, ' .
-            'somecol TEXT' .
-        ')');
-        $this->connection = new Connection($this->pdo);
-        $this->queryFactory = new QueryFactory('sqlite');
+        parent::beforeEach();
     }
 
     public function testInsertWritesDataToDb()
@@ -92,25 +77,5 @@ class ConnectionTests extends TestCase
         $this->assertEquals(1, $deleteRowCount);
         $countAfterDeletion = count($this->fetchTestData($id, 'fetchAll'));
         $this->assertEquals($countBeforeDeletion - 1, $countAfterDeletion);
-    }
-
-    /**
-     * Inserts some $data into test_table
-     */
-    private function insertTestData(array $data): int
-    {
-        $insertQuery = $this->queryFactory->newInsert();
-        $insertQuery->into('test_table')->cols($data);
-        return $this->connection->insert($insertQuery);
-    }
-
-    /**
-     * Fetches data from test_table where id = $id using PDOStatement->$method
-     */
-    private function fetchTestData(string $id, string $method = 'fetch'): array
-    {
-        $sth = $this->pdo->prepare('SELECT id,somecol FROM test_table WHERE id = :id');
-        $sth->execute(['id' => $id]);
-        return $sth->$method(PDO::FETCH_ASSOC);
     }
 }
