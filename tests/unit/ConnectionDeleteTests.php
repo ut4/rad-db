@@ -34,8 +34,8 @@ trait ConnectionDeleteTests
         $result = $this->connection->delete($deleteQ);
         // Assert
         $this->assertEquals(
-            $result,
             $mockRowCount,
+            $result,
             'Should return the row count'
         );
     }

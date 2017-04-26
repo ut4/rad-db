@@ -36,8 +36,8 @@ trait ConnectionSelectTests
         $result = $this->connection->fetchAll($selectQ);
         // Assert
         $this->assertEquals(
-            $result,
             $mockResultsFromPdo,
+            $result,
             'Should return the results'
         );
     }

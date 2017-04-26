@@ -41,8 +41,8 @@ trait ConnectionInsertTests
         $result = $this->connection->insert($insertQ);
         // Assert
         $this->assertEquals(
-            $result,
             (int) $mockLastInsertId,
+            $result,
             'Should return the lastInsertId as an integer'
         );
     }
@@ -69,6 +69,6 @@ trait ConnectionInsertTests
         $insertQ->method('getBindValues')->willReturn('<data>');
         $result = $this->connection->insert($insertQ);
         // Assert
-        $this->assertEquals($result, 0, 'Should return 0');
+        $this->assertEquals(0, $result, 'Should return 0');
     }
 }

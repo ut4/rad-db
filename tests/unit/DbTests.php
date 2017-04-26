@@ -31,8 +31,8 @@ class DbTest extends TestCase
         $result = $this->db->insert($insertQuery);
         // Assert
         $this->assertEquals(
-            $result,
             $mockValueFromConnection,
+            $result,
             'Should return value directly from <connection>'
         );
     }
@@ -49,8 +49,8 @@ class DbTest extends TestCase
         $result = $this->db->selectAll($selectAllQuery);
         // Assert
         $this->assertEquals(
-            $result,
             $mockValueFromConnection,
+            $result,
             'Should return value directly from <connection>'
         );
     }
@@ -80,8 +80,8 @@ class DbTest extends TestCase
         $result = $this->db->selectOne($selectOneQuery);
         // Assert
         $this->assertEquals(
-            $result,
             $mockValueFromConnection[0],
+            $result,
             'Should return first value from the array returned by <connection>'
         );
     }
@@ -105,8 +105,8 @@ class DbTest extends TestCase
         $result = $this->db->update($updateQuery);
         // Assert
         $this->assertEquals(
-            $result,
             $mockValueFromConnection,
+            $result,
             'Should return value directly from <connection>'
         );
     }
@@ -123,8 +123,8 @@ class DbTest extends TestCase
         $result = $this->db->delete($deleteQuery);
         // Assert
         $this->assertEquals(
-            $result,
             $mockValueFromConnection,
+            $result,
             'Should return value directly from <connection>'
         );
     }

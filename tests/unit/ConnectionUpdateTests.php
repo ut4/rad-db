@@ -34,8 +34,8 @@ trait ConnectionUpdateTests
         $result = $this->connection->update($updateQ);
         // Assert
         $this->assertEquals(
-            $result,
             $mockRowCount,
+            $result,
             'Should return the row count'
         );
     }
