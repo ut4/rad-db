@@ -13,7 +13,10 @@ class DbTest extends TestCase
     private $mockConn;
     private $db;
 
-    public function __construct()
+    /**
+     * @before
+     */
+    public function beforeEach()
     {
         $this->mockConn = $this->createMock(Connection::class);
         $this->db = new Db($this->mockConn);

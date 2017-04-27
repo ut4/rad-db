@@ -15,7 +15,10 @@ class ConnectionTest extends TestCase
     private $mockPdo;
     private $connection;
 
-    public function __construct()
+    /**
+     * @before
+     */
+    public function beforeEach()
     {
         $this->mockPdo = $this->createMock(PDO::class);
         $this->connection = new Connection($this->mockPdo);
