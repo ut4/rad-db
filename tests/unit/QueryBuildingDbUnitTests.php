@@ -62,65 +62,22 @@ class QueryBuildingDbUnitTests extends TestCase
 
     public function testSelectAllBuildsQueryAndCallsBaseDb()
     {
-        $tableToSelectFrom = 'ser';
-        $columnsToSelect = ['foo'];
-        $mockBuilder = new QueryMockBuilder($this->createMock(Select::class), $this);
-        $mockBuilder->expect('from', $tableToSelectFrom);
-        $mockBuilder->expect('cols', $columnsToSelect);
-        $mockSelectQuery = $mockBuilder->getMock();
-        $this->mockQueryFactory->expects($this->once())
-            ->method('newSelect')
-            ->willReturn($mockSelectQuery);
-        $mockResultsFromBaseDb = [['foo' => 'bar']];
-        $this->mockBaseDb->expects($this->once())
-            ->method('selectAll')
-            ->with($mockSelectQuery)
-            ->willReturn($mockResultsFromBaseDb);
-        // Execute
-        $result = $this->qbDb->selectAll(
-            $tableToSelectFrom,
-            $columnsToSelect
-        );
-        $this->assertEquals(
-            $mockResultsFromBaseDb,
-            $result,
-            'Should return the results from <db>'
-        );
+        $this->assertSelectBuildsQueryAndCallsBaseDb('selectAll');
     }
 
     public function testSelectAllCallsFilterApplierCallback()
     {
-        $tableToSelectFrom = 'tyue';
-        $columnsToSelect = ['rtt', 'ty'];
-        $where = ['col' => 'id', 'value' => 12];
-        $filterApplier = function ($q) use ($where) {
-            $q->where($where['col'], $where['value']);
-        };
-        $mockBuilder = new QueryMockBuilder($this->createMock(Select::class), $this);
-        $mockBuilder->expect('from', $tableToSelectFrom);
-        $mockBuilder->expect('cols', $columnsToSelect);
-        $mockBuilder->expect('where', $where['col'], $where['value']);
-        $mockSelectQuery = $mockBuilder->getMock();
-        $this->mockQueryFactory->expects($this->once())
-            ->method('newSelect')
-            ->willReturn($mockSelectQuery);
-        $mockResultsFromBaseDb = [['foo' => 'bar']];
-        $this->mockBaseDb->expects($this->once())
-            ->method('selectAll')
-            ->with($mockSelectQuery)
-            ->willReturn($mockResultsFromBaseDb);
-        // Execute
-        $result = $this->qbDb->selectAll(
-            $tableToSelectFrom,
-            $columnsToSelect,
-            null, // fetchArgs
-            $filterApplier
-        );
-        $this->assertEquals(
-            $mockResultsFromBaseDb,
-            $result,
-            'Should return the results from <db>'
-        );
+        $this->assertSelectCallsFilterApplierCallback('selectAll');
+    }
+
+    public function testSelectOneBuildsQueryAndCallsBaseDb()
+    {
+        $this->assertSelectBuildsQueryAndCallsBaseDb('selectOne');
+    }
+
+    public function testSelectOneCallsFilterApplierCallback()
+    {
+        $this->assertSelectCallsFilterApplierCallback('selectOne');
     }
 
     public function testUpdateBuildsQueryAndCallsBaseDb()
@@ -214,6 +171,70 @@ class QueryBuildingDbUnitTests extends TestCase
             $mockRowCountFromBaseDb,
             $result,
             'Should return the row count from <db>'
+        );
+    }
+
+    private function assertSelectBuildsQueryAndCallsBaseDb(
+        string $selectMethod
+    ) {
+        $tableToSelectFrom = 'ser';
+        $columnsToSelect = ['foo'];
+        $mockBuilder = new QueryMockBuilder($this->createMock(Select::class), $this);
+        $mockBuilder->expect('from', $tableToSelectFrom);
+        $mockBuilder->expect('cols', $columnsToSelect);
+        $mockSelectQuery = $mockBuilder->getMock();
+        $this->mockQueryFactory->expects($this->once())
+            ->method('newSelect')
+            ->willReturn($mockSelectQuery);
+        $mockResultsFromBaseDb = [['foo' => 'bar']];
+        $this->mockBaseDb->expects($this->once())
+            ->method($selectMethod)
+            ->with($mockSelectQuery)
+            ->willReturn($mockResultsFromBaseDb);
+        // Execute
+        $result = $this->qbDb->$selectMethod(
+            $tableToSelectFrom,
+            $columnsToSelect
+        );
+        $this->assertEquals(
+            $mockResultsFromBaseDb,
+            $result,
+            'Should return the results from <db>'
+        );
+    }
+
+    private function assertSelectCallsFilterApplierCallback(
+        string $selectMethod
+    ) {
+        $tableToSelectFrom = 'tyue';
+        $columnsToSelect = ['rtt', 'ty'];
+        $where = ['col' => 'id', 'value' => 12];
+        $filterApplier = function ($q) use ($where) {
+            $q->where($where['col'], $where['value']);
+        };
+        $mockBuilder = new QueryMockBuilder($this->createMock(Select::class), $this);
+        $mockBuilder->expect('from', $tableToSelectFrom);
+        $mockBuilder->expect('cols', $columnsToSelect);
+        $mockBuilder->expect('where', $where['col'], $where['value']);
+        $mockSelectQuery = $mockBuilder->getMock();
+        $this->mockQueryFactory->expects($this->once())
+            ->method('newSelect')
+            ->willReturn($mockSelectQuery);
+        $mockResultsFromBaseDb = [['foo' => 'bar']];
+        $this->mockBaseDb->expects($this->once())
+            ->method($selectMethod)
+            ->with($mockSelectQuery)
+            ->willReturn($mockResultsFromBaseDb);
+        // Execute
+        $result = $this->qbDb->$selectMethod(
+            $tableToSelectFrom,
+            $columnsToSelect,
+            $filterApplier
+        );
+        $this->assertEquals(
+            $mockResultsFromBaseDb,
+            $result,
+            'Should return the results from <db>'
         );
     }
 }

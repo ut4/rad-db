@@ -71,29 +71,22 @@ class DbTest extends TestCase
         $this->db->selectAll($selectAllQuery, $fetchArgs);
     }
 
-    public function testSelectOneCallsConnectionAndReturnsFirstItemFromResults()
+    public function testSelectOneCallsConnection()
     {
         $selectOneQuery = $this->createMock(SelectInterface::class);
-        $mockValueFromConnection = [['col' => 'val'], ['col' => 'val2']];
+        $mockValueFromConnection = ['col' => 'val'];
         $this->mockConn->expects($this->once())
-            ->method('fetchAll')
+            ->method('fetch')
             ->with($selectOneQuery)
             ->willReturn($mockValueFromConnection);
         // Execute
         $result = $this->db->selectOne($selectOneQuery);
         // Assert
         $this->assertEquals(
-            $mockValueFromConnection[0],
+            $mockValueFromConnection,
             $result,
             'Should return first value from the array returned by <connection>'
         );
-    }
-
-    public function testSelectOneReturnsEmptyArrayIfConnectionReturnsEmptyResults()
-    {
-        $this->mockConn->expects($this->once())->method('fetchAll')->willReturn([]);
-        $result = $this->db->selectOne($this->createMock(SelectInterface::class));
-        $this->assertEquals([], $result);
     }
 
     public function testUpdateCallsConnection()

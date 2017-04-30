@@ -67,7 +67,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         );
     }
 
-    public function testSelectAllFetchesDataIntoClass()
+    public function testSelectAllUsesFetchArgs()
     {
         $entityClass = Resources\TestTableEntity::class;
         $testRow = ['somecol' => 'ert'];
@@ -76,6 +76,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         $results = $this->queryBuildingDb->selectAll(
             'test_table',
             ['id', 'somecol'],
+            null, // filterApplier
             [PDO::FETCH_CLASS, $entityClass]
         );
         // Assert

@@ -61,17 +61,63 @@ class QueryBuildingDb
     /**
      * @param string|Aura\SqlQuery\Common\SelectInterface $tableNameOrQuery
      * @param array $columns = null
-     * @param $fetchArgs = null
      * @param Callable $filterApplier = null
+     * @param $fetchArgs = null
      * @param array[]
      */
     public function selectAll(
         $tableNameOrQuery,
         array $columns = null,
-        array $fetchArgs = null,
-        Callable $filterApplier = null
+        Callable $filterApplier = null,
+        array $fetchArgs = null
     ): array {
-        return $this->db->selectAll(
+        return $this->doSelect(
+            'selectAll',
+            $tableNameOrQuery,
+            $columns,
+            $filterApplier,
+            $fetchArgs
+        );
+    }
+
+    /**
+     * @param string|Aura\SqlQuery\Common\SelectInterface $tableNameOrQuery
+     * @param array $columns
+     * @param Callable $filterApplier = null
+     * @param $fetchArgs = null
+     * @param array
+     */
+    public function selectOne(
+        $tableNameOrQuery,
+        array $columns = null,
+        Callable $filterApplier = null,
+        array $fetchArgs = null
+    ): array {
+        return $this->doSelect(
+            'selectOne',
+            $tableNameOrQuery,
+            $columns,
+            $filterApplier,
+            $fetchArgs
+        );
+    }
+
+    /**
+     * @param string $method selectAll or selectOne
+     * @param string|Aura\SqlQuery\Common\SelectInterface $tableNameOrQuery
+     * @param array $columns
+     * @param Callable $filterApplier = null
+     * @param $fetchArgs = null
+     * @param array
+     */
+    private function doSelect(
+        string $method,
+        $tableNameOrQuery,
+        array $columns = null,
+        Callable $filterApplier = null,
+        array $fetchArgs = null
+    ): array {
+        return $this->db->$method(
             ($tableNameOrQuery instanceof SelectInterface)
                 ? $tableNameOrQuery
                 : $this->makeSelectQuery(
@@ -101,24 +147,6 @@ class QueryBuildingDb
             $filterApplier($select);
         }
         return $select;
-    }
-
-    /**
-     * @param string|Aura\SqlQuery\Common\SelectInterface $tableNameOrQuery
-     * @param array $columns
-     * @param Callable $filterApplier = null
-     * @param array|null
-     */
-    public function selectOne(
-        $tableNameOrQuery,
-        array $columns = null,
-        Callable $filterApplier = null
-    ): array {
-        return $this->selectAll(
-            $tableNameOrQuery,
-            $columns,
-            $filterApplier
-        )[0] ?? [];
     }
 
     /**

@@ -46,7 +46,7 @@ class Db
         SelectInterface $selectQuery,
         $fetchArgs = null
     ): array {
-        return $this->selectAll($selectQuery, $fetchArgs)[0] ?? [];
+        return $this->conn->fetch($selectQuery, $fetchArgs);
     }
 
     /**
