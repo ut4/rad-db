@@ -1,8 +1,9 @@
 <?php
 
-namespace Rad\Db;
+namespace Rad\Db\Integration;
 
 use PDO;
+use Rad\Db\Connection;
 use Aura\SqlQuery\QueryFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +19,8 @@ class InMemoryPDOTestCase extends TestCase
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->query('CREATE TABLE test_table (' .
             'id INTEGER PRIMARY KEY AUTOINCREMENT, ' .
-            'somecol TEXT' .
+            'somecol TEXT, ' .
+            'number TEXT' .
         ')');
         $this->connection = new Connection($this->pdo);
         $this->queryFactory = new QueryFactory('sqlite');
@@ -41,7 +43,7 @@ class InMemoryPDOTestCase extends TestCase
         string $id = null,
         string $method = 'fetch'
     ): array {
-        $q = 'SELECT id, somecol FROM test_table';
+        $q = 'SELECT id, somecol, number FROM test_table';
         if ($id) {
             $sth = $this->pdo->prepare($q . ' WHERE id = :id');
             $sth->execute(['id' => $id]);

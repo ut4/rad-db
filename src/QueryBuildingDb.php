@@ -48,7 +48,7 @@ class QueryBuildingDb
         string $tableName,
         array $mappedData
     ): InsertInterface {
-        $values = $this->getMappedDataAsAssoc($mappedData);
+        $values = $this->jsonSerializeAll($mappedData);
         $insert = $this->queryFactory->newInsert()
             ->into($tableName)
             ->cols($values[0]);
@@ -229,9 +229,9 @@ class QueryBuildingDb
      * @return array[]
      * @throws UnexpectedValueException
      */
-    private function getMappedDataAsAssoc(array $mappedData): array
+    private function jsonSerializeAll(array $mappedData): array
     {
-        $asAssoc = [];
+        $mapped = [];
         foreach ($mappedData as $item) {
             if (!($item instanceof JsonSerializable)) {
                 throw new UnexpectedValueException(
@@ -239,8 +239,8 @@ class QueryBuildingDb
                     '\\JsonSerializable'
                 );
             }
-            $asAssoc[] = $item->jsonSerialize();
+            $mapped[] = $item->jsonSerialize();
         }
-        return $asAssoc;
+        return $mapped;
     }
 }

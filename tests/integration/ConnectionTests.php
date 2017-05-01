@@ -1,6 +1,6 @@
 <?php
 
-namespace Rad\Db;
+namespace Rad\Db\Integration;
 
 /**
  * Tests that Connection->pdo plays along with Aura\SqlQuery\QueryInterfaces
@@ -17,7 +17,7 @@ class ConnectionTests extends InMemoryPDOTestCase
 
     public function testInsertWritesDataToDb()
     {
-        $expectedData = ['somecol' => 'a value'];
+        $expectedData = ['somecol' => 'a value', 'number' => 27];
         // Execute
         $insertId = $this->insertTestData($expectedData);
         // Assert
@@ -25,7 +25,8 @@ class ConnectionTests extends InMemoryPDOTestCase
         $this->assertEquals(
             [
                 'id' => $insertId,
-                'somecol' => $expectedData['somecol']
+                'somecol' => $expectedData['somecol'],
+                'number' => $expectedData['number']
             ],
             $this->fetchTestData($insertId)
         );

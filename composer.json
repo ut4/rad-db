@@ -8,8 +8,7 @@
         "psr-4": {
             "Rad\\Db\\": [
                 "src/",
-                "tests/unit",
-                "tests/integration"
+                "tests/"
             ]
         }
     },

@@ -2,7 +2,9 @@
 
 namespace Rad\Db\Resources;
 
-class TestTableEntity extends JsonObject
+use Rad\Db\JsonObject as SmartJsonObject;
+
+class TestTableEntity extends SmartJsonObject
 {
     protected $id;
     protected $somecol;

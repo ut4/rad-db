@@ -1,8 +1,10 @@
 <?php
 
-namespace Rad\Db;
+namespace Rad\Db\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Rad\Db\Connection;
+use Rad\Db\Db;
 use Aura\SqlQuery\Common\InsertInterface;
 use Aura\SqlQuery\Common\SelectInterface;
 use Aura\SqlQuery\Common\UpdateInterface;

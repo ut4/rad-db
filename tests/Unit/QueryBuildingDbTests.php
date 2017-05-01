@@ -1,16 +1,19 @@
 <?php
 
-namespace Rad\Db;
+namespace Rad\Db\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Aura\SqlQuery\QueryFactory;
+use Rad\Db\Db;
+use Rad\Db\QueryBuildingDb;
+use Rad\Db\Resources\QueryMockBuilder;
 use Aura\SqlQuery\Common\Insert;
 use Aura\SqlQuery\Common\Select;
 use Aura\SqlQuery\Common\Update;
 use Aura\SqlQuery\Common\Delete;
-use Rad\Db\Resources\QueryMockBuilder;
+use Rad\Db\Resources\JsonObject;
 
-class QueryBuildingDbUnitTests extends TestCase
+class QueryBuildingDbTests extends TestCase
 {
     private $mockQueryFactory;
     private $mockBaseDb;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Rad\Db;
+namespace Rad\Db\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Rad\Db\BasicMapper;

@@ -1,9 +1,9 @@
 <?php
 
-namespace Rad\Db;
+namespace Rad\Db\Unit;
 
 use PDOStatement;
-use Aura\SqlQuery\Sqlite\Insert;
+use Aura\SqlQuery\Common\Insert;
 
 trait ConnectionInsertTests
 {

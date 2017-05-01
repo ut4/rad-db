@@ -1,9 +1,10 @@
 <?php
 
-namespace Rad\Db;
+namespace Rad\Db\Unit;
 
-use PDO;
 use PHPUnit\Framework\TestCase;
+use Rad\Db\Connection;
+use PDO;
 
 class ConnectionTest extends TestCase
 {

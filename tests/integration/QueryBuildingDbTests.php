@@ -1,8 +1,12 @@
 <?php
 
-namespace Rad\Db;
+namespace Rad\Db\Integration;
 
 use PDO;
+use Rad\Db\QueryBuildingDb;
+use Rad\Db\Db;
+use Rad\Db\Resources\JsonObject;
+use Rad\Db\Resources\TestTableEntity;
 
 /**
  * Tests that QueryBuildingDb writes/selects stuff correctly from/to the
@@ -28,6 +32,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
     {
         $data = new JsonObject();
         $data->somecol = 'val';
+        $data->number = 567;
         // Execute
         $insertId = $this->queryBuildingDb->insert('test_table', [$data]);
         // Assert
@@ -35,7 +40,8 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         $this->assertEquals(
             [
                 'id' => $insertId,
-                'somecol' => $data->jsonSerialize()['somecol']
+                'somecol' => $data->somecol,
+                'number' => $data->number
             ],
             $this->fetchTestData($insertId)
         );
@@ -69,7 +75,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
 
     public function testSelectAllUsesFetchArgs()
     {
-        $entityClass = Resources\TestTableEntity::class;
+        $entityClass = TestTableEntity::class;
         $testRow = ['somecol' => 'ert'];
         $this->insertTestData($testRow);
         // Execute

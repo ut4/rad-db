@@ -1,9 +1,9 @@
 <?php
 
-namespace Rad\Db;
+namespace Rad\Db\Unit;
 
 use PDOStatement;
-use Aura\SqlQuery\Sqlite\Delete;
+use Aura\SqlQuery\Common\Delete;
 
 trait ConnectionDeleteTests
 {
