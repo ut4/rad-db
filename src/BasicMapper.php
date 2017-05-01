@@ -26,9 +26,15 @@ class BasicMapper implements Mapper
     public function map(
         array $input,
         array $omit = null,
-        array $bindHints = null
+        array $bindHints = null,
+        bool $keys = false
     ): JsonSerializable {
         $entity = $this->makeNewEntity();
+        if ($keys) {// TODO fix this madness
+            $entity->__keys = true;
+            return $entity;
+        }
+        $entity->__setProps = [];
         $entity->__omit = $omit;
         foreach ($input as $name => $value) {
             if ($omit && in_array($name, $omit)) {
@@ -37,6 +43,7 @@ class BasicMapper implements Mapper
             $setterMethodName = 'set' . ucfirst($name);
             if (method_exists($entity, $setterMethodName)) {
                 $entity->$setterMethodName($value);
+                $entity->__setProps[] = $name;
             }
         }
         return $entity;
