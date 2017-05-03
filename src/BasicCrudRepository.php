@@ -47,13 +47,29 @@ abstract class BasicCrudRepository
     public abstract function getEntityClassPath(): string;
 
     /**
-     * @param array[] $data
+     * @param array|array[] $data
      * @param array $bindHints = null
      * @return int
      */
     public function insert(array $data, array $bindHints = null): int
     {
+        if (isset($data[0])) {
+            return $this->insertMany($data, $bindHints);
+        }
         return $this->queryBuildingDb->insert(
+            $this->getTableName(),
+            $this->mapper->map($data, [$this->getIdColumnName()], $bindHints)
+        );
+    }
+
+    /**
+     * @param array[] $data
+     * @param array $bindHints = null
+     * @return int
+     */
+    public function insertMany(array $data, array $bindHints = null): int
+    {
+        return $this->queryBuildingDb->insertMany(
             $this->getTableName(),
             $this->mapper->mapAll($data, [$this->getIdColumnName()], $bindHints)
         );

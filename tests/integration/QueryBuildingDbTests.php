@@ -34,7 +34,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         $data->somecol = 'val';
         $data->number = 567;
         // Execute
-        $insertId = $this->queryBuildingDb->insert('test_table', [$data]);
+        $insertId = $this->queryBuildingDb->insert('test_table', $data);
         // Assert
         $this->assertGreaterThan(0, $insertId);
         $this->assertEquals(
@@ -47,14 +47,14 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         );
     }
 
-    public function testInsertWritesultipleItemsToDb()
+    public function testInsertManyWritesultipleItemsToDb()
     {
         $data = new JsonObject();
         $data->somecol = 'val';
         $data2 = new JsonObject();
         $data2->somecol = 'another';
         // Execute
-        $insertId = $this->queryBuildingDb->insert(
+        $insertId = $this->queryBuildingDb->insertMany(
             'test_table',
             [$data, $data2]
         );

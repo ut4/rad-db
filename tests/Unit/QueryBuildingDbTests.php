@@ -29,17 +29,9 @@ class QueryBuildingDbTests extends TestCase
         );
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testInsertThrowsIfDataIsNotJsonSerializable()
-    {
-        $this->qbDb->insert('sometable', [[]]);
-    }
-
     public function testInsertBuildsQueryAndCallsBaseDb()
     {
-        $tableToInsertTo = 'rty';
+        $tableToInsertTo = 'atable';
         $dataToInsert = new JsonObject();
         $dataToInsert->foo = 'bar';
         $mockBuilder = new QueryMockBuilder($this->createMock(Insert::class), $this);
@@ -49,17 +41,71 @@ class QueryBuildingDbTests extends TestCase
         $this->mockQueryFactory->expects($this->once())
             ->method('newInsert')
             ->willReturn($mockInsertQuery);
-        $mockRowCountFromBaseDb = 23;
+        $mockInsertIdFromBaseDb = 23;
         $this->mockBaseDb->expects($this->once())
             ->method('insert')
             ->with($mockInsertQuery)
-            ->willReturn($mockRowCountFromBaseDb);
+            ->willReturn($mockInsertIdFromBaseDb);
         // Execute
-        $result = $this->qbDb->insert($tableToInsertTo, [$dataToInsert]);
+        $result = $this->qbDb->insert($tableToInsertTo, $dataToInsert);
         $this->assertEquals(
-            $mockRowCountFromBaseDb,
+            $mockInsertIdFromBaseDb,
             $result,
-            'Should return the row count from <db>'
+            'Should return the insertId from <db>'
+        );
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testInsertManyThrowsIfDataIsNotJsonSerializable()
+    {
+        $this->qbDb->insertMany('sometable', ['foo' => 'bar']);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testInsertManyThrowsIfDataIsNotJsonSerializable2()
+    {
+        $this->qbDb->insertMany('sometable', [new \stdClass()]);
+    }
+
+    public function testInsertManyBuildsQueryAndCallsBaseDb()
+    {
+        $tableToInsertTo = 'qtwetable';
+        $firstItem = new JsonObject();
+        $firstItem->foo = 'bar';
+        $secondItem = new JsonObject();
+        $secondItem->foo = 'asz';
+        $thirdItem = new JsonObject();
+        $thirdItem->foo = 'hiz';
+        $mockBuilder = new QueryMockBuilder($this->createMock(Insert::class), $this);
+        $mockBuilder->expect('into', $tableToInsertTo);
+        // https://github.com/auraphp/Aura.SqlQuery/blob/3.x/docs/insert.md
+        $mockBuilder->expect('cols', $firstItem->jsonSerialize());
+        $mockBuilder->expect('addRows', [
+            $secondItem->jsonSerialize(),
+            $thirdItem->jsonSerialize()
+        ]);
+        $mockInsertQuery = $mockBuilder->getMock();
+        $this->mockQueryFactory->expects($this->once())
+            ->method('newInsert')
+            ->willReturn($mockInsertQuery);
+        $mockInsertIdFromBaseDb = 23;
+        $this->mockBaseDb->expects($this->once())
+            ->method('insert')
+            ->with($mockInsertQuery)
+            ->willReturn($mockInsertIdFromBaseDb);
+        // Execute
+        $result = $this->qbDb->insertMany(
+            $tableToInsertTo,
+            [$firstItem, $secondItem, $thirdItem]
+        );
+        $this->assertEquals(
+            $mockInsertIdFromBaseDb,
+            $result,
+            'Should return the insertId from <db>'
         );
     }
 

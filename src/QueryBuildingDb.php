@@ -27,11 +27,13 @@ class QueryBuildingDb
 
     /**
      * @param string|Aura\SqlQuery\Common\InsertInterface $tableNameOrQuery
-     * @param JsonSerializable[] $mappedData = null
+     * @param JsonSerializable $mappedData = null
      * @return int
      */
-    public function insert($tableNameOrQuery, array $mappedData = null): int
-    {
+    public function insert(
+        $tableNameOrQuery,
+        JsonSerializable $mappedData = null
+    ): int {
         return $this->db->insert(
             ($tableNameOrQuery instanceof InsertInterface)
                 ? $tableNameOrQuery
@@ -40,18 +42,47 @@ class QueryBuildingDb
     }
 
     /**
+     * @param string|Aura\SqlQuery\Common\InsertInterface $tableNameOrQuery
+     * @param JsonSerializable[] $mappedData = null
+     * @return int
+     */
+    public function insertMany($tableNameOrQuery, array $mappedData = null): int
+    {
+        return $this->db->insert(
+            ($tableNameOrQuery instanceof InsertInterface)
+                ? $tableNameOrQuery
+                : $this->makeInsertManyQuery($tableNameOrQuery, $mappedData)
+        );
+    }
+
+    /**
      * @param string $tableName
-     * @param JsonSerializable[] $mappedData
+     * @param JsonSerializable $mappedData
      * @return InsertInterface
      */
     private function makeInsertQuery(
         string $tableName,
+        JsonSerializable $mappedData
+    ): InsertInterface {
+        $insert = $this->queryFactory->newInsert();
+        $insert->into($tableName);
+        $insert->cols($mappedData->jsonSerialize());
+        return $insert;
+    }
+
+    /**
+     * @param string $tableName
+     * @param JsonSerializable[] $mappedData
+     * @return InsertInterface
+     */
+    private function makeInsertManyQuery(
+        string $tableName,
         array $mappedData
     ): InsertInterface {
         $values = $this->jsonSerializeAll($mappedData);
-        $insert = $this->queryFactory->newInsert()
-            ->into($tableName)
-            ->cols($values[0]);
+        $insert = $this->queryFactory->newInsert();
+        $insert->into($tableName);
+        $insert->cols($values[0]);
         if (count($values) > 1) {
             $insert->addRows(array_slice($values, 1));
         }
@@ -231,7 +262,7 @@ class QueryBuildingDb
      */
     private function jsonSerializeAll(array $mappedData): array
     {
-        $mapped = [];
+        $serialized = [];
         foreach ($mappedData as $item) {
             if (!($item instanceof JsonSerializable)) {
                 throw new UnexpectedValueException(
@@ -239,8 +270,8 @@ class QueryBuildingDb
                     '\\JsonSerializable'
                 );
             }
-            $mapped[] = $item->jsonSerialize();
+            $serialized[] = $item->jsonSerialize();
         }
-        return $mapped;
+        return $serialized;
     }
 }
