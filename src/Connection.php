@@ -14,7 +14,7 @@ class Connection
     protected $fetchMode;
 
     /**
-     * @param PDO $pdo
+     * @param PDO $pdo Note; assumes that PDO::ATTR_ERRMODE is PDO::ERRMODE_EXCEPTION
      */
     public function __construct(PDO $pdo)
     {

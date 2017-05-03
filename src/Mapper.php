@@ -16,4 +16,8 @@ interface Mapper
      * @return JsonSerializable[]
      */
     public function mapAll(array $inputs, array $omit = []): array;
+    /**
+     * @return array
+     */
+    public function getKeys(): array;
 }

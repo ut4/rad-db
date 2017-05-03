@@ -52,6 +52,30 @@ class BasicMapperTests extends TestCase
         $this->assertEquals($expected->getNumber(), $result->getNumber());
     }
 
+    public function testMapMarksAllSetPropertiesAsSet()
+    {
+        $input = ['somecol' => 'a value', 'number' => '45', 'junk' => 'afo'];
+        $mapper = new BasicMapper(TestTableEntity::class);
+        // Execute
+        $result = $mapper->map($input);
+        // Assert
+        $property = (new \ReflectionObject($result))->getProperty('mappedProps');
+        $property->setAccessible(true);
+        $this->assertEquals(['somecol', 'number'], $property->getValue($result));
+    }
+
+    public function testMapSetsOmitListToMappedItem()
+    {
+        $omitList = ['id'];
+        $mapper = new BasicMapper(TestTableEntity::class);
+        // Execute & Assert
+        $result = $mapper->map(['somedata' =>'afoo'], $omitList);
+        // Hackssert
+        $property = (new \ReflectionObject($result))->getProperty('propsToOmit');
+        $property->setAccessible(true);
+        $this->assertEquals($omitList, $property->getValue($result));
+    }
+
     public function testMapAllInstantiatesAndMapsAnArrayOfItems()
     {
         $inputs = [
@@ -84,13 +108,21 @@ class BasicMapperTests extends TestCase
         $this->assertEquals($inputs['number'], $results[0]->getNumber());
     }
 
-    public function testMapSetsOmitListToMappedItem()
+    public function testMapAllReturnsEmptyArrayIfTheresNothingToMap()
     {
-        $omitList = ['id'];
         $mapper = new BasicMapper(TestTableEntity::class);
         // Execute
-        $result = $mapper->map(['somedata' =>'afoo'], $omitList);
+        $results = $mapper->mapAll([]);
         // Assert
-        $this->assertEquals($omitList, $result->__omit);
+        $this->assertSame([], $results);
+    }
+
+    public function testGetKeysCollectsKeysFromSetters()
+    {
+        $mapper = new BasicMapper(TestTableEntity::class);
+        // Execute
+        $result = $mapper->getKeys();
+        // Assert
+        $this->assertEquals(['id', 'somecol', 'number'], $result);
     }
 }

@@ -26,16 +26,10 @@ class BasicMapper implements Mapper
     public function map(
         array $input,
         array $omit = null,
-        array $bindHints = null,
-        bool $keys = false
+        array $bindHints = null
     ): JsonSerializable {
         $entity = $this->makeNewEntity();
-        if ($keys) {// TODO fix this madness
-            $entity->__keys = true;
-            return $entity;
-        }
-        $entity->__setProps = [];
-        $entity->__omit = $omit;
+        $entity->omitThese($omit);
         foreach ($input as $name => $value) {
             if ($omit && in_array($name, $omit)) {
                 continue;
@@ -43,7 +37,7 @@ class BasicMapper implements Mapper
             $setterMethodName = 'set' . ucfirst($name);
             if (method_exists($entity, $setterMethodName)) {
                 $entity->$setterMethodName($value);
-                $entity->__setProps[] = $name;
+                $entity->markIsSet($name);
             }
         }
         return $entity;
@@ -60,6 +54,9 @@ class BasicMapper implements Mapper
         array $omit = null,
         array $bindHints = null
     ): array {
+        if (!$inputs) {
+            return [];
+        }
         return array_map(
             function (array $input) use ($omit, $bindHints) {
                 return $this->map($input, $omit, $bindHints);
@@ -69,23 +66,39 @@ class BasicMapper implements Mapper
     }
 
     /**
+     * @return array
+     */
+    public function getKeys(): array
+    {
+        $keys = [];
+        foreach (get_class_methods($this->entityClassPath) as $methodName) {
+            if (substr($methodName, 0, 3) !== 'set') {
+                continue;
+            }
+            // setFoo -> Foo -> foo, setSomeProp -> SomeProp -> someProp
+            $keys[] = lcfirst(substr($methodName, 3));
+        }
+        return $keys;
+    }
+
+    /**
      * @param string $entityClassPath
      * @throws InvalidArgumentException
      */
     public function setEntityClassPath(string $entityClassPath)
     {
-        if (!in_array('JsonSerializable', class_implements($entityClassPath))) {
+        if (!is_subclass_of($entityClassPath, JsonObject::class)) {
             throw new InvalidArgumentException(
-                $entityClassPath . ' should implement \\JsonSerializable'
+                $entityClassPath . ' should extend \\Rad\\Db\\JsonObject'
             );
         }
         $this->entityClassPath = $entityClassPath;
     }
 
     /**
-     * @return JsonSerializable
+     * @return JsonObject
      */
-    private function makeNewEntity(): JsonSerializable
+    private function makeNewEntity(): JsonObject
     {
         return new $this->entityClassPath();
     }

@@ -73,8 +73,10 @@ abstract class BasicCrudRepository
      * @param array $cols = null
      * @return JsonSerializable[]
      */
-    public function findAll(Callable $filterApplier, array $cols = null): array
-    {
+    public function findAll(
+        Callable $filterApplier,
+        array $cols = null
+    ): array {
         return $this->doSelect(true, $cols, $filterApplier);
     }
 
@@ -83,8 +85,10 @@ abstract class BasicCrudRepository
      * @param array $cols = null
      * @return JsonSerializable
      */
-    public function findOne(Callable $filterApplier, array $cols = null): JsonSerializable
-    {
+    public function findOne(
+        Callable $filterApplier,
+        array $cols = null
+    ): JsonSerializable {
         return $this->doSelect(false, $cols, $filterApplier);
     }
 
@@ -102,7 +106,7 @@ abstract class BasicCrudRepository
         return $this->mapper->{$selectMany ? 'mapAll' : 'map'}(
             $this->queryBuildingDb->{$selectMany ? 'selectAll' : 'selectOne'}(
                 $this->getTableName(),
-                $cols ?? array_keys($this->mapper->map([], null, null, true)->jsonSerialize()),
+                $cols ?? $this->mapper->getKeys(),
                 $filterApplier
             )
         );

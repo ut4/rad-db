@@ -33,16 +33,15 @@ trait BasicCrudRepositorySelectTests
 
     public function testSelectAllUsesDefaultColumns()
     {
-        $emptyTestEntity = new JsonObject();
-        $emptyTestEntity->foo = null;
-        $emptyTestEntity->nar = null;
+        $someKeys = ['foo', 'bar'];
         $this->mockMapper
-            ->method('map')
-            ->willReturn($emptyTestEntity);
+            ->expects($this->once())
+            ->method('getKeys')
+            ->willReturn($someKeys);
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->testRepository->getTableName(), ['foo', 'nar']);
+            ->with($this->testRepository->getTableName(), $someKeys);
         // Execute & Assert
         $this->testRepository->selectAll();
     }
@@ -75,16 +74,15 @@ trait BasicCrudRepositorySelectTests
 
     public function testFindAllUsesDefaultColumns()
     {
-        $emptyTestEntity = new JsonObject();
-        $emptyTestEntity->foo = null;
-        $emptyTestEntity->nar = null;
+        $someKeys = ['nar', 'gar'];
         $this->mockMapper
-            ->method('map')
-            ->willReturn($emptyTestEntity);
+            ->expects($this->once())
+            ->method('getKeys')
+            ->willReturn($someKeys);
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->testRepository->getTableName(), ['foo', 'nar']);
+            ->with($this->testRepository->getTableName(), $someKeys);
         // Execute & Assert
         $where = function () {};
         $this->testRepository->findAll($where);
@@ -116,18 +114,17 @@ trait BasicCrudRepositorySelectTests
         );
     }
 
-    public function testFetchOneUsesDefaultColumns()
+    public function testFindOneUsesDefaultColumns()
     {
-        $emptyTestEntity = new JsonObject();
-        $emptyTestEntity->foo = null;
-        $emptyTestEntity->nar = null;
+        $someKeys = ['bar', 'var'];
         $this->mockMapper
-            ->method('map')
-            ->willReturn($emptyTestEntity);
+            ->expects($this->once())
+            ->method('getKeys')
+            ->willReturn($someKeys);
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectOne')
-            ->with($this->testRepository->getTableName(), ['foo', 'nar']);
+            ->with($this->testRepository->getTableName(), $someKeys);
         // Execute & Assert
         $where = function () {};
         $this->testRepository->findOne($where);
