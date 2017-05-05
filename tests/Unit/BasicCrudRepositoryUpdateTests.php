@@ -10,7 +10,7 @@ trait BasicCrudRepositoryUpdateTests
     {
         $input = ['foo' => 'bar'];
         $where = function () {};
-        $expectedOmitList = [$this->testRepository->getIdColumnName()];
+        $expectedOmitList = [$this->bookRepository->getIdColumnName()];
         $bindHints = [];
         $mockMappedData = new JsonObject();
         $this->mockMapper
@@ -22,10 +22,10 @@ trait BasicCrudRepositoryUpdateTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('update')
-            ->with($this->testRepository->getTableName(), $mockMappedData, $where)
+            ->with($this->bookRepository->getTableName(), $mockMappedData, $where)
             ->willReturn($mockRowCountFromDb);
         // Execute
-        $result = $this->testRepository->update($input, $where, $bindHints);
+        $result = $this->bookRepository->update($input, $where, $bindHints);
         // Assert
         $this->assertEquals(
             $mockRowCountFromDb,
@@ -48,6 +48,6 @@ trait BasicCrudRepositoryUpdateTests
                 })
             );
         // Execute & Assert
-        $this->testRepository->update([]);
+        $this->bookRepository->update([]);
     }
 }

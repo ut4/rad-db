@@ -10,17 +10,17 @@ trait BasicCrudRepositoryDeleteTests
     {
         // Prepare
         $data = [
-            ['somecol' => 'jkl', 'number' => 51],
-            ['somecol' => 'öä', 'number' => 52]
+            ['title' => 'jkl', 'pagecount' => 51],
+            ['title' => 'öä', 'pagecount' => 52]
         ];
         $id = $this->insertTestData($data[0]);
         $id2 = $this->insertTestData($data[1]);
         // Execute
-        $rowCount = $this->testBasicCrudRepository->delete(
+        $rowCount = $this->bookRepository->delete(
             [],
             function (QueryInterface $q) use ($data) {
-                $q->where('somecol = :scv');
-                $q->bindValue('scv', $data[0]['somecol']);
+                $q->where('title = :tv');
+                $q->bindValue('tv', $data[0]['title']);
             }
         );
         // Assert
@@ -33,13 +33,13 @@ trait BasicCrudRepositoryDeleteTests
     {
         // Prepare
         $data = [
-            ['somecol' => 'zxc', 'number' => 53],
-            ['somecol' => 'vbn', 'number' => 54]
+            ['title' => 'zxc', 'pagecount' => 53],
+            ['title' => 'vbn', 'pagecount' => 54]
         ];
         $id = $this->insertTestData($data[0]);
         $id2 = $this->insertTestData($data[1]);
         // Execute
-        $rowCount = $this->testBasicCrudRepository->delete(['id' => $id2]);
+        $rowCount = $this->bookRepository->delete(['id' => $id2]);
         // Assert
         $this->assertEquals(1, $rowCount);
         $this->assertEmpty($this->fetchTestData($id2));

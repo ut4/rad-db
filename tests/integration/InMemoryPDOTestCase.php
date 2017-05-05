@@ -17,33 +17,33 @@ class InMemoryPDOTestCase extends TestCase
     {
         $this->pdo = new PDO('sqlite::memory:');
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->query('CREATE TABLE test_table (' .
+        $this->pdo->query('CREATE TABLE books (' .
             'id INTEGER PRIMARY KEY AUTOINCREMENT, ' .
-            'somecol TEXT, ' .
-            'number TEXT' .
+            'title TEXT, ' .
+            'pagecount INTEGER' .
         ')');
         $this->connection = new Connection($this->pdo);
         $this->queryFactory = new QueryFactory('sqlite');
     }
 
     /**
-     * Inserts $data to test_table
+     * Inserts $data to books
      */
     protected function insertTestData(array $data): int
     {
         $insertQuery = $this->queryFactory->newInsert();
-        $insertQuery->into('test_table')->cols($data);
+        $insertQuery->into('books')->cols($data);
         return $this->connection->insert($insertQuery);
     }
 
     /**
-     * Fetches data from test_table where id = $id using PDOStatement->$method
+     * Fetches data from books where id = $id using PDOStatement->$method
      */
     protected function fetchTestData(
         string $id = null,
         string $method = 'fetch'
     ): array {
-        $q = 'SELECT id, somecol, number FROM test_table';
+        $q = 'SELECT id, title, pagecount FROM books';
         if ($id) {
             $sth = $this->pdo->prepare($q . ' WHERE id = :id');
             $sth->execute(['id' => $id]);

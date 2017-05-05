@@ -10,55 +10,55 @@ trait BasicCrudRepositoryUpdateTests
     {
         // Prepare
         $data = [
-            ['somecol' => 'qwe', 'number' => 45],
-            ['somecol' => 'rty', 'number' => 46]
+            ['title' => 'qwe', 'pagecount' => 45],
+            ['title' => 'rty', 'pagecount' => 46]
         ];
         $id = $this->insertTestData($data[0]);
         $id2 = $this->insertTestData($data[1]);
         // Modify something & execute
         $itemToUpdate = $this->fetchTestData($id);
         $itemToUpdate['id'] = '567';// this should not have any effect
-        $itemToUpdate['somecol'] = 'uio';
-        $itemToUpdate['number'] = '47';
-        $rowCount = $this->testBasicCrudRepository->update(
+        $itemToUpdate['title'] = 'uio';
+        $itemToUpdate['pagecount'] = '47';
+        $rowCount = $this->bookRepository->update(
             $itemToUpdate,
             function (QueryInterface $q) use ($data) {
-                $q->where('somecol = :scv');
-                $q->bindValue('scv', $data[0]['somecol']);
+                $q->where('title = :tv');
+                $q->bindValue('tv', $data[0]['title']);
             }
         );
         // Assert
         $this->assertEquals(1, $rowCount);
         $updated = $this->fetchTestData($id);
         $this->assertEquals($id, $updated['id']);
-        $this->assertEquals($itemToUpdate['somecol'], $updated['somecol']);
-        $this->assertEquals($itemToUpdate['number'], $updated['number']);
+        $this->assertEquals($itemToUpdate['title'], $updated['title']);
+        $this->assertEquals($itemToUpdate['pagecount'], $updated['pagecount']);
         $notUpdated = $this->fetchTestData($id2);
-        $this->assertEquals($data[1]['somecol'], $notUpdated['somecol']);
-        $this->assertEquals($data[1]['number'], $notUpdated['number']);
+        $this->assertEquals($data[1]['title'], $notUpdated['title']);
+        $this->assertEquals($data[1]['pagecount'], $notUpdated['pagecount']);
     }
 
     public function testUpdateMapsAndUpdatesSingleItemUsingDefaultFilters()
     {
         // Prepare
         $data = [
-            ['somecol' => 'på', 'number' => 48],
-            ['somecol' => 'asd', 'number' => 49]
+            ['title' => 'på', 'pagecount' => 48],
+            ['title' => 'asd', 'pagecount' => 49]
         ];
         $id = $this->insertTestData($data[0]);
         $id2 = $this->insertTestData($data[1]);
         // Modify something & execute
         $itemToUpdate = $this->fetchTestData($id);
-        $itemToUpdate['somecol'] = 'fgh';
-        $itemToUpdate['number'] = '50';
-        $rowCount = $this->testBasicCrudRepository->update($itemToUpdate);
+        $itemToUpdate['title'] = 'fgh';
+        $itemToUpdate['pagecount'] = '50';
+        $rowCount = $this->bookRepository->update($itemToUpdate);
         // Assert
         $this->assertEquals(1, $rowCount);
         $updated = $this->fetchTestData($id);
-        $this->assertEquals($itemToUpdate['somecol'], $updated['somecol']);
-        $this->assertEquals($itemToUpdate['number'], $updated['number']);
+        $this->assertEquals($itemToUpdate['title'], $updated['title']);
+        $this->assertEquals($itemToUpdate['pagecount'], $updated['pagecount']);
         $notUpdated = $this->fetchTestData($id2);
-        $this->assertEquals($data[1]['somecol'], $notUpdated['somecol']);
-        $this->assertEquals($data[1]['number'], $notUpdated['number']);
+        $this->assertEquals($data[1]['title'], $notUpdated['title']);
+        $this->assertEquals($data[1]['pagecount'], $notUpdated['pagecount']);
     }
 }

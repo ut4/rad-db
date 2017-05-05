@@ -17,7 +17,7 @@ class ConnectionTests extends InMemoryPDOTestCase
 
     public function testInsertWritesDataToDb()
     {
-        $expectedData = ['somecol' => 'a value', 'number' => 27];
+        $expectedData = ['title' => 'a value', 'pagecount' => 27];
         // Execute
         $insertId = $this->insertTestData($expectedData);
         // Assert
@@ -25,8 +25,8 @@ class ConnectionTests extends InMemoryPDOTestCase
         $this->assertEquals(
             [
                 'id' => $insertId,
-                'somecol' => $expectedData['somecol'],
-                'number' => $expectedData['number']
+                'title' => $expectedData['title'],
+                'pagecount' => $expectedData['pagecount']
             ],
             $this->fetchTestData($insertId)
         );
@@ -34,44 +34,44 @@ class ConnectionTests extends InMemoryPDOTestCase
 
     public function testFetchAllReadsData()
     {
-        $rows = [['somecol' => 'a'], ['somecol' => 'b']];
+        $rows = [['title' => 'a'], ['title' => 'b']];
         $this->insertTestData($rows[0]);
         $this->insertTestData($rows[1]);
         $selectQuery = $this->queryFactory->newSelect();
-        $selectQuery->from('test_table')->cols(['id', 'somecol']);
+        $selectQuery->from('books')->cols(['id', 'title']);
         // Execute
         $results = $this->connection->fetchAll($selectQuery);
         // Assert
-        $this->assertEquals($rows[0]['somecol'], $results[0]['somecol']);
-        $this->assertEquals($rows[1]['somecol'], $results[1]['somecol']);
+        $this->assertEquals($rows[0]['title'], $results[0]['title']);
+        $this->assertEquals($rows[1]['title'], $results[1]['title']);
     }
 
     public function testUpdateOverwritesData()
     {
-        $rows = [['somecol' => 'c'], ['somecol' => 'd']];
+        $rows = [['title' => 'c'], ['title' => 'd']];
         $id = $this->insertTestData($rows[0]);
         $updateQuery = $this->queryFactory->newUpdate();
-        $updateQuery->table('test_table')
-            ->cols(['somecol'])
+        $updateQuery->table('books')
+            ->cols(['title'])
             ->where('id = :id')
             ->bindValues([
                 'id' => $id,
-                'somecol' => $rows[1]['somecol']
+                'title' => $rows[1]['title']
             ]);
         // Execute
         $updateRowCount = $this->connection->update($updateQuery);
         // Assert
         $this->assertEquals(1, $updateRowCount);
-        $this->assertEquals($rows[1]['somecol'], $rows[1]['somecol']);
+        $this->assertEquals($rows[1]['title'], $rows[1]['title']);
     }
 
     public function testDeleteWipesData()
     {
-        $someData = ['somecol' => 'e'];
+        $someData = ['title' => 'e'];
         $id = $this->insertTestData($someData);
         $countBeforeDeletion = count($this->fetchTestData($id, 'fetchAll'));
         $deleteQuery = $this->queryFactory->newDelete();
-        $deleteQuery->from('test_table')->where('id = :id')->bindValue('id', $id);
+        $deleteQuery->from('books')->where('id = :id')->bindValue('id', $id);
         // Execute
         $deleteRowCount = $this->connection->delete($deleteQuery);
         // Assert

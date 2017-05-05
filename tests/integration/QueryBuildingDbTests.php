@@ -6,7 +6,7 @@ use PDO;
 use Rad\Db\QueryBuildingDb;
 use Rad\Db\Db;
 use Rad\Db\Resources\JsonObject;
-use Rad\Db\Resources\TestTableEntity;
+use Rad\Db\Resources\Book;
 
 /**
  * Tests that QueryBuildingDb writes/selects stuff correctly from/to the
@@ -31,17 +31,17 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
     public function testInsertWritesSingleItemToDb()
     {
         $data = new JsonObject();
-        $data->somecol = 'val';
-        $data->number = 567;
+        $data->title = 'val';
+        $data->pagecount = 567;
         // Execute
-        $insertId = $this->queryBuildingDb->insert('test_table', $data);
+        $insertId = $this->queryBuildingDb->insert('books', $data);
         // Assert
         $this->assertGreaterThan(0, $insertId);
         $this->assertEquals(
             [
                 'id' => $insertId,
-                'somecol' => $data->somecol,
-                'number' => $data->number
+                'title' => $data->title,
+                'pagecount' => $data->pagecount
             ],
             $this->fetchTestData($insertId)
         );
@@ -50,52 +50,52 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
     public function testInsertManyWritesultipleItemsToDb()
     {
         $data = new JsonObject();
-        $data->somecol = 'val';
+        $data->title = 'val';
         $data2 = new JsonObject();
-        $data2->somecol = 'another';
+        $data2->title = 'another';
         // Execute
         $insertId = $this->queryBuildingDb->insertMany(
-            'test_table',
+            'books',
             [$data, $data2]
         );
         // Assert
         $this->assertGreaterThan(0, $insertId);
         $insertedRows = $this->fetchTestData(null, 'fetchAll');
         $this->assertCount(2, $insertedRows);
-        $insertedValues = array_column($insertedRows, 'somecol');
+        $insertedValues = array_column($insertedRows, 'title');
         $this->assertContains(
-            $data->jsonSerialize()['somecol'],
+            $data->jsonSerialize()['title'],
             $insertedValues
         );
         $this->assertContains(
-            $data2->jsonSerialize()['somecol'],
+            $data2->jsonSerialize()['title'],
             $insertedValues
         );
     }
 
     public function testSelectAllUsesFetchArgs()
     {
-        $entityClass = TestTableEntity::class;
-        $testRow = ['somecol' => 'ert'];
+        $entityClass = Book::class;
+        $testRow = ['title' => 'ert'];
         $this->insertTestData($testRow);
         // Execute
         $results = $this->queryBuildingDb->selectAll(
-            'test_table',
-            ['id', 'somecol'],
+            'books',
+            ['id', 'title'],
             null, // filterApplier
             [PDO::FETCH_CLASS, $entityClass]
         );
         // Assert
         $this->assertInstanceOf($entityClass, $results[0]);
-        $this->assertEquals($testRow['somecol'], $results[0]->getSomecol());
+        $this->assertEquals($testRow['title'], $results[0]->getTitle());
     }
 
     public function testSelectOneReturnsEmptyArrayWhenConnectionReturnsEmptyResults()
     {
         // Execute
         $results = $this->queryBuildingDb->selectOne(
-            'test_table',
-            ['id', 'somecol']
+            'books',
+            ['id', 'title']
         );
         // Assert
         $this->assertEquals([], $results);
@@ -103,35 +103,35 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
 
     public function testUpdateWithoutFilterApplierOverwritesData()
     {
-        $insertId = $this->insertTestData(['somecol' => 'val']);
+        $insertId = $this->insertTestData(['title' => 'val']);
         // Execute
         $newData = new JsonObject();
-        $newData->somecol = 'updated val';
-        $result = $this->queryBuildingDb->update('test_table', $newData);
+        $newData->title = 'updated val';
+        $result = $this->queryBuildingDb->update('books', $newData);
         // Assert
         $expectedRowCount = 1;
         $this->assertEquals($expectedRowCount, $result);
         $this->assertEquals(
-            $newData->jsonSerialize()['somecol'],
-            $this->fetchTestData($insertId)['somecol']
+            $newData->jsonSerialize()['title'],
+            $this->fetchTestData($insertId)['title']
         );
     }
 
     public function testUpdateWithFilterApplierOverwritesData()
     {
-        $firstData = ['somecol' => 'val'];
+        $firstData = ['title' => 'val'];
         $firstId = $this->insertTestData($firstData);
-        $secondData = ['somecol' => 'val'];
+        $secondData = ['title' => 'val'];
         $secondId = $this->insertTestData($secondData);
         // Update only the second one
         $newData = new JsonObject();
-        $newData->somecol = 'updated val';
+        $newData->title = 'updated val';
         $filterApplier = function ($updateQueryRef) use ($secondId) {
             $updateQueryRef->where('id = :id');
             $updateQueryRef->bindValue('id', $secondId);
         };
         $result = $this->queryBuildingDb->update(
-            'test_table',
+            'books',
             $newData,
             $filterApplier
         );
@@ -141,18 +141,18 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         $newFirstData = $this->fetchTestData($firstId);
         $newSecondData = $this->fetchTestData($secondId);
         $this->assertEquals(
-            $newData->jsonSerialize()['somecol'],
-            $newSecondData['somecol']
+            $newData->jsonSerialize()['title'],
+            $newSecondData['title']
         );
         $this->assertEquals(
-            $firstData['somecol'],
-            $newFirstData['somecol']
+            $firstData['title'],
+            $newFirstData['title']
         );
     }
 
     public function testDeleteWipesData()
     {
-        $testRow = ['somecol' => 'ert'];
+        $testRow = ['title' => 'ert'];
         $insertId = $this->insertTestData($testRow);
         $rowCountBeforeDeletion = count($this->fetchTestData(null, 'fetchAll'));
         $this->assertGreaterThan(0, $rowCountBeforeDeletion);
@@ -161,7 +161,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
             $deleteQueryRef->where('id = :id');
             $deleteQueryRef->bindValue('id', $insertId);
         };
-        $result = $this->queryBuildingDb->delete('test_table', $filterApplier);
+        $result = $this->queryBuildingDb->delete('books', $filterApplier);
         // Assert
         $expectedRowCount = 1;
         $this->assertEquals($expectedRowCount, $result);

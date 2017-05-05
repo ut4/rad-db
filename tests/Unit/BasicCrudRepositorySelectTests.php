@@ -14,7 +14,7 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->testRepository->getTableName(), $columns)
+            ->with($this->bookRepository->getTableName(), $columns)
             ->willReturn($mockRowsFromDb);
         $this->mockMapper
             ->expects($this->once())
@@ -22,7 +22,7 @@ trait BasicCrudRepositorySelectTests
             ->with($mockRowsFromDb)
             ->willReturn($mockMappedData);
         // Execute
-        $result = $this->testRepository->selectAll($columns);
+        $result = $this->bookRepository->selectAll($columns);
         // Assert
         $this->assertEquals(
             $mockMappedData,
@@ -41,9 +41,9 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->testRepository->getTableName(), $someKeys);
+            ->with($this->bookRepository->getTableName(), $someKeys);
         // Execute & Assert
-        $this->testRepository->selectAll();
+        $this->bookRepository->selectAll();
     }
 
     public function testFindAllFetchesAndMapsMultipleRows()
@@ -55,7 +55,7 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->testRepository->getTableName(), $columns, $where)
+            ->with($this->bookRepository->getTableName(), $columns, $where)
             ->willReturn($mockRowsFromDb);
         $this->mockMapper
             ->expects($this->once())
@@ -63,7 +63,7 @@ trait BasicCrudRepositorySelectTests
             ->with($mockRowsFromDb)
             ->willReturn($mockMappedData);
         // Execute
-        $result = $this->testRepository->findAll($where, $columns);
+        $result = $this->bookRepository->findAll($where, $columns);
         // Assert
         $this->assertEquals(
             $mockMappedData,
@@ -82,10 +82,10 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->testRepository->getTableName(), $someKeys);
+            ->with($this->bookRepository->getTableName(), $someKeys);
         // Execute & Assert
         $where = function () {};
-        $this->testRepository->findAll($where);
+        $this->bookRepository->findAll($where);
     }
 
     public function testFindOneFetchesAndMapsASingleRow()
@@ -97,7 +97,7 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectOne')
-            ->with($this->testRepository->getTableName(), $columns, $where)
+            ->with($this->bookRepository->getTableName(), $columns, $where)
             ->willReturn($mockRowFromDb);
         $this->mockMapper
             ->expects($this->once())
@@ -105,7 +105,7 @@ trait BasicCrudRepositorySelectTests
             ->with($mockRowFromDb)
             ->willReturn($mockMappedData);
         // Execute
-        $result = $this->testRepository->findOne($where, $columns);
+        $result = $this->bookRepository->findOne($where, $columns);
         // Assert
         $this->assertEquals(
             $mockMappedData,
@@ -124,9 +124,9 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectOne')
-            ->with($this->testRepository->getTableName(), $someKeys);
+            ->with($this->bookRepository->getTableName(), $someKeys);
         // Execute & Assert
         $where = function () {};
-        $this->testRepository->findOne($where);
+        $this->bookRepository->findOne($where);
     }
 }

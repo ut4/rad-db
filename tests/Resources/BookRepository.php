@@ -3,17 +3,17 @@
 namespace Rad\Db\Resources;
 
 use Rad\Db\BasicCrudRepository;
-use Rad\Db\Resources\TestTableEntity;
+use Rad\Db\Resources\Book;
 
-class TestRepository extends BasicCrudRepository
+class BookRepository extends BasicCrudRepository
 {
     public function getEntityClassPath(): string
     {
-        return TestTableEntity::class;
+        return Book::class;
     }
 
     public function getTableName(): string
     {
-        return 'test_table';
+        return 'books';
     }
 }

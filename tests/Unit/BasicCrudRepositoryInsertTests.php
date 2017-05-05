@@ -10,7 +10,7 @@ trait BasicCrudRepositoryInsertTests
     {
         $input = ['foo' => 'bar'];
         $mockMappedItem = new JsonObject();
-        $expectedOmitList = [$this->testRepository->getIdColumnName()];
+        $expectedOmitList = [$this->bookRepository->getIdColumnName()];
         $this->mockMapper
             ->expects($this->once())
             ->method('map')
@@ -20,10 +20,10 @@ trait BasicCrudRepositoryInsertTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('insert')
-            ->with($this->testRepository->getTableName(), $mockMappedItem)
+            ->with($this->bookRepository->getTableName(), $mockMappedItem)
             ->willReturn($mockInsertIdFromDb);
         // Execute
-        $result = $this->testRepository->insert($input);
+        $result = $this->bookRepository->insert($input);
         // Assert
         $this->assertEquals(
             $mockInsertIdFromDb,
@@ -40,7 +40,7 @@ trait BasicCrudRepositoryInsertTests
         ];
         $bindHints = ['foo.haz' => '<AnotherEntityClass>'];
         $mockMappedItems = [new JsonObject(), new JsonObject()];
-        $expectedOmitList = [$this->testRepository->getIdColumnName()];
+        $expectedOmitList = [$this->bookRepository->getIdColumnName()];
         $this->mockMapper
             ->expects($this->once())
             ->method('mapAll')
@@ -50,10 +50,10 @@ trait BasicCrudRepositoryInsertTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('insertMany')
-            ->with($this->testRepository->getTableName(), $mockMappedItems)
+            ->with($this->bookRepository->getTableName(), $mockMappedItems)
             ->willReturn($mockInsertIdFromDb);
         // Execute
-        $result = $this->testRepository->insert($inputs, $bindHints);
+        $result = $this->bookRepository->insert($inputs, $bindHints);
         // Assert
         $this->assertEquals(
             $mockInsertIdFromDb,

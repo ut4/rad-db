@@ -4,7 +4,7 @@ namespace Rad\Db\Integration;
 
 use Rad\Db\Db;
 use Rad\Db\QueryBuildingDb;
-use Rad\Db\Resources\TestRepository;
+use Rad\Db\Resources\BookRepository;
 
 class BasicCrudRepositoryTests extends InMemoryPDOTestCase
 {
@@ -14,7 +14,7 @@ class BasicCrudRepositoryTests extends InMemoryPDOTestCase
     use BasicCrudRepositoryDeleteTests;
 
     private $queryBuildingDb;
-    private $testBasicCrudRepository;
+    private $bookRepository;
 
     /**
      * @before
@@ -26,7 +26,7 @@ class BasicCrudRepositoryTests extends InMemoryPDOTestCase
             new Db($this->connection),
             $this->queryFactory
         );
-        $this->testBasicCrudRepository = new TestRepository(
+        $this->bookRepository = new BookRepository(
             $this->queryBuildingDb
         );
     }
