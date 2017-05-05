@@ -5,7 +5,7 @@ namespace Rad\Db;
 use JsonSerializable;
 use Aura\SqlQuery\QueryInterface;
 
-abstract class BasicCrudRepository
+abstract class BasicCrudRepository implements Repository
 {
     /**
      * @var QueryBuildingDb
