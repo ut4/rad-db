@@ -5,7 +5,7 @@ namespace Rad\Db;
 use JsonSerializable;
 use Aura\SqlQuery\QueryInterface;
 
-abstract class BasicCrudRepository implements Repository
+abstract class BasicCrudRepository implements Repository, Mappable
 {
     /**
      * @var QueryBuildingDb
@@ -36,19 +36,27 @@ abstract class BasicCrudRepository implements Repository
     /**
      * @return string
      */
+    public abstract function getEntityClassPath(): string;
+
+    /**
+     * @return string
+     */
     public function getIdColumnName(): string
     {
         return 'id';
     }
 
     /**
-     * @return string
+     * @return BindHint[]
      */
-    public abstract function getEntityClassPath(): string;
+    public function getBindHints(): array
+    {
+        return [];
+    }
 
     /**
      * @param array|array[] $data
-     * @param array $bindHints = null
+     * @param BindHint[] $bindHints = null
      * @return int
      */
     public function insert(array $data, array $bindHints = null): int
@@ -71,7 +79,7 @@ abstract class BasicCrudRepository implements Repository
     {
         return $this->queryBuildingDb->insertMany(
             $this->getTableName(),
-            $this->mapper->mapAll($data, [$this->getIdColumnName()], $bindHints)
+            $this->mapper->mapAll($data, [$this->getIdColumnName()])
         );
     }
 
@@ -144,7 +152,7 @@ abstract class BasicCrudRepository implements Repository
         }
         return $this->queryBuildingDb->update(
             $this->getTableName(),
-            $this->mapper->map($input, [$this->getIdColumnName()], $bindHints),
+            $this->mapper->map($input, [$this->getIdColumnName()]),
             $filterApplier
         );
     }
