@@ -5,6 +5,7 @@ namespace Rad\Db\Unit;
 use PHPUnit\Framework\TestCase;
 use Rad\Db\BasicMapper;
 use Rad\Db\Resources\Book;
+use Rad\Db\Resources\Note;
 
 class BasicMapperTests extends TestCase
 {
@@ -23,6 +24,12 @@ class BasicMapperTests extends TestCase
     {
         $mapper = new BasicMapper(Book::class);
         $mapper->setEntityClassPath('stdClass');
+    }
+
+    public function testMapWithADifferentEntityClassPath()
+    {
+        $mapper = new BasicMapper(Book::class);
+        $this->assertInstanceof(Note::class, $mapper->map([], null, Note::class));
     }
 
     public function testMapInstantiatesAndMapsDataToEntityClass()

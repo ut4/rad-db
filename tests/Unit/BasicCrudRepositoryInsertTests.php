@@ -44,7 +44,7 @@ trait BasicCrudRepositoryInsertTests
         $this->mockMapper
             ->expects($this->once())
             ->method('mapAll')
-            ->with($inputs, $expectedOmitList, $bindHints)
+            ->with($inputs, $expectedOmitList)
             ->willReturn($mockMappedItems);
         $mockInsertIdFromDb = 2;
         $this->mockQueryBuildingDb

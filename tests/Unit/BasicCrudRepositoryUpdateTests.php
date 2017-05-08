@@ -16,7 +16,7 @@ trait BasicCrudRepositoryUpdateTests
         $this->mockMapper
             ->expects($this->once())
             ->method('map')
-            ->with($input, $expectedOmitList, $bindHints)
+            ->with($input, $expectedOmitList)
             ->willReturn($mockMappedData);
         $mockRowCountFromDb = 1;
         $this->mockQueryBuildingDb

@@ -20,25 +20,29 @@ class BasicMapper implements Mapper
     /**
      * @param array $input
      * @param array $omit = null
-     * @param array $bindHints = null
+     * @param string $entityClassPath = null
      * @return JsonSerializable
      */
     public function map(
         array $input,
         array $omit = null,
-        array $bindHints = null
+        string $entityClassPath = null
     ): JsonSerializable {
-        $entity = $this->makeNewEntity();
+        $entity = $this->makeNewEntity($entityClassPath);
         $entity->omitThese($omit);
         foreach ($input as $name => $value) {
+            // Value explicitly marked as "ignore me pls" -> do nothing
             if ($omit && in_array($name, $omit)) {
                 continue;
             }
+            // Value has no setter -> do nothing
             $setterMethodName = 'set' . ucfirst($name);
-            if (method_exists($entity, $setterMethodName)) {
-                $entity->$setterMethodName($value);
-                $entity->markIsSet($name);
+            if (!method_exists($entity, $setterMethodName)) {
+                continue;
             }
+            // Setter found -> call it and mark $name as set
+            $entity->$setterMethodName($value);
+            $entity->markIsSet($name);
         }
         return $entity;
     }
@@ -46,20 +50,20 @@ class BasicMapper implements Mapper
     /**
      * @param array[] $inputs
      * @param array $omit = null
-     * @param array $bindHints = null
+     * @param string $entityClassPath = null
      * @return JsonSerializable[]
      */
     public function mapAll(
         array $inputs,
         array $omit = null,
-        array $bindHints = null
+        string $entityClassPath = null
     ): array {
         if (!$inputs) {
             return [];
         }
         return array_map(
-            function (array $input) use ($omit, $bindHints) {
-                return $this->map($input, $omit, $bindHints);
+            function (array $input) use ($omit, $entityClassPath) {
+                return $this->map($input, $omit, $entityClassPath);
             },
             !isset($inputs[0]) ? [$inputs] : $inputs
         );
@@ -96,10 +100,11 @@ class BasicMapper implements Mapper
     }
 
     /**
+     * @param string $entityClassPath = null
      * @return JsonObject
      */
-    private function makeNewEntity(): JsonObject
+    private function makeNewEntity(string $entityClassPath = null): JsonObject
     {
-        return new $this->entityClassPath();
+        return !$entityClassPath ? new $this->entityClassPath() : new $entityClassPath();
     }
 }

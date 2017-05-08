@@ -10,13 +10,13 @@ class Book extends SmartJsonObject
     protected $title;
     protected $pagecount;
 
-    public function setId($id)
-    {
-        $this->id = (int) $id;
-    }
     public function getId(): int
     {
         return $this->id;
+    }
+    public function setId($id)
+    {
+        $this->id = (int) $id;
     }
 
     public function getTitle(): string
