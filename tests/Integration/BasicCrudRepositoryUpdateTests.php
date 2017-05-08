@@ -16,7 +16,7 @@ trait BasicCrudRepositoryUpdateTests
         $id = $this->insertTestData($data[0]);
         $id2 = $this->insertTestData($data[1]);
         // Modify something & execute
-        $itemToUpdate = $this->fetchTestData($id);
+        $itemToUpdate = $this->fetchTestData('books', $id);
         $itemToUpdate['id'] = '567';// this should not have any effect
         $itemToUpdate['title'] = 'uio';
         $itemToUpdate['pagecount'] = '47';
@@ -29,11 +29,11 @@ trait BasicCrudRepositoryUpdateTests
         );
         // Assert
         $this->assertEquals(1, $rowCount);
-        $updated = $this->fetchTestData($id);
+        $updated = $this->fetchTestData('books', $id);
         $this->assertEquals($id, $updated['id']);
         $this->assertEquals($itemToUpdate['title'], $updated['title']);
         $this->assertEquals($itemToUpdate['pagecount'], $updated['pagecount']);
-        $notUpdated = $this->fetchTestData($id2);
+        $notUpdated = $this->fetchTestData('books', $id2);
         $this->assertEquals($data[1]['title'], $notUpdated['title']);
         $this->assertEquals($data[1]['pagecount'], $notUpdated['pagecount']);
     }
@@ -48,16 +48,16 @@ trait BasicCrudRepositoryUpdateTests
         $id = $this->insertTestData($data[0]);
         $id2 = $this->insertTestData($data[1]);
         // Modify something & execute
-        $itemToUpdate = $this->fetchTestData($id);
+        $itemToUpdate = $this->fetchTestData('books', $id);
         $itemToUpdate['title'] = 'fgh';
         $itemToUpdate['pagecount'] = '50';
         $rowCount = $this->bookRepository->update($itemToUpdate);
         // Assert
         $this->assertEquals(1, $rowCount);
-        $updated = $this->fetchTestData($id);
+        $updated = $this->fetchTestData('books', $id);
         $this->assertEquals($itemToUpdate['title'], $updated['title']);
         $this->assertEquals($itemToUpdate['pagecount'], $updated['pagecount']);
-        $notUpdated = $this->fetchTestData($id2);
+        $notUpdated = $this->fetchTestData('books', $id2);
         $this->assertEquals($data[1]['title'], $notUpdated['title']);
         $this->assertEquals($data[1]['pagecount'], $notUpdated['pagecount']);
     }

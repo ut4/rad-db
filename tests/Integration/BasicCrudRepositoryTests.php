@@ -21,7 +21,7 @@ class BasicCrudRepositoryTests extends InMemoryPDOTestCase
      */
     public function beforeEach()
     {
-        parent::beforeEach();
+        parent::beforeEach(true);
         $this->queryBuildingDb = new QueryBuildingDb(
             new Db($this->connection),
             $this->queryFactory

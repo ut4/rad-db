@@ -17,11 +17,10 @@ class InMemoryPDOTestCase extends TestCase
     {
         $this->pdo = new PDO('sqlite::memory:');
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->query('CREATE TABLE books (' .
-            'id INTEGER PRIMARY KEY AUTOINCREMENT, ' .
-            'title TEXT, ' .
-            'pagecount INTEGER' .
-        ')');
+        $setupQueries = $this->getTestDbSchemaQueries(
+            func_num_args() > 0 ? func_get_arg(0) : false
+        );
+        array_map([$this->pdo, 'query'], $setupQueries);
         $this->connection = new Connection($this->pdo);
         $this->queryFactory = new QueryFactory('sqlite');
     }
@@ -40,18 +39,53 @@ class InMemoryPDOTestCase extends TestCase
      * Fetches data from books where id = $id using PDOStatement->$method
      */
     protected function fetchTestData(
-        string $id = null,
+        string $tableName,
+        string $whereExprOrId = null,
+        array $bind = null,
         string $method = 'fetch'
     ): array {
-        $q = 'SELECT id, title, pagecount FROM books';
-        if ($id) {
+        if ($tableName === 'notes') {
+            $q = 'SELECT id, content, booksId FROM notes';
+        } else {
+            $q = 'SELECT id, title, pagecount FROM books';
+        }
+        if (!$bind && $whereExprOrId) {
             $sth = $this->pdo->prepare($q . ' WHERE id = :id');
-            $sth->execute(['id' => $id]);
+            $sth->execute(['id' => $whereExprOrId]);
+        } else if($bind && $whereExprOrId) {
+            $sth = $this->pdo->prepare($q . ' WHERE ' . $whereExprOrId);
+            $sth->execute($bind);
         } else {
             $sth = $this->pdo->prepare($q);
             $sth->execute();
         }
         $rows = $sth->$method(PDO::FETCH_ASSOC);
         return $rows ? $rows : [];
+    }
+
+    private function getTestDbSchemaQueries(bool $full): array
+    {
+        if (!$full) {
+            return ['CREATE TABLE books (' .
+                'id INTEGER PRIMARY KEY AUTOINCREMENT, ' .
+                'title TEXT, ' .
+                'pagecount INTEGER' .
+            ')'];
+        }
+        return [
+            'CREATE TABLE books (' .
+                'id INTEGER PRIMARY KEY AUTOINCREMENT, ' .
+                'title TEXT, ' .
+                'pagecount INTEGER, ' .
+                'author_id INTEGER, ' .
+                'FOREIGN KEY (author_id) REFERENCES authors(id)' .
+            ')',
+            'CREATE TABLE notes (' .
+                'id INTEGER PRIMARY KEY AUTOINCREMENT, ' .
+                'content TEXT,' .
+                'booksId INTEGER, ' .
+                'FOREIGN KEY (booksId) REFERENCES books(id)' .
+            ')'
+        ];
     }
 }

@@ -28,7 +28,7 @@ class ConnectionTests extends InMemoryPDOTestCase
                 'title' => $expectedData['title'],
                 'pagecount' => $expectedData['pagecount']
             ],
-            $this->fetchTestData($insertId)
+            $this->fetchTestData('books', $insertId)
         );
     }
 
@@ -69,14 +69,14 @@ class ConnectionTests extends InMemoryPDOTestCase
     {
         $someData = ['title' => 'e'];
         $id = $this->insertTestData($someData);
-        $countBeforeDeletion = count($this->fetchTestData($id, 'fetchAll'));
+        $countBeforeDeletion = count($this->fetchTestData('books', $id, null, 'fetchAll'));
         $deleteQuery = $this->queryFactory->newDelete();
         $deleteQuery->from('books')->where('id = :id')->bindValue('id', $id);
         // Execute
         $deleteRowCount = $this->connection->delete($deleteQuery);
         // Assert
         $this->assertEquals(1, $deleteRowCount);
-        $countAfterDeletion = count($this->fetchTestData($id, 'fetchAll'));
+        $countAfterDeletion = count($this->fetchTestData('books', $id, null, 'fetchAll'));
         $this->assertEquals($countBeforeDeletion - 1, $countAfterDeletion);
     }
 }

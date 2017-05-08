@@ -43,7 +43,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
                 'title' => $data->title,
                 'pagecount' => $data->pagecount
             ],
-            $this->fetchTestData($insertId)
+            $this->fetchTestData('books', $insertId)
         );
     }
 
@@ -60,7 +60,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         );
         // Assert
         $this->assertGreaterThan(0, $insertId);
-        $insertedRows = $this->fetchTestData(null, 'fetchAll');
+        $insertedRows = $this->fetchTestData('books', null, null, 'fetchAll');
         $this->assertCount(2, $insertedRows);
         $insertedValues = array_column($insertedRows, 'title');
         $this->assertContains(
@@ -113,7 +113,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         $this->assertEquals($expectedRowCount, $result);
         $this->assertEquals(
             $newData->jsonSerialize()['title'],
-            $this->fetchTestData($insertId)['title']
+            $this->fetchTestData('books', $insertId)['title']
         );
     }
 
@@ -138,8 +138,8 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         // Assert
         $expectedRowCount = 1;
         $this->assertEquals($expectedRowCount, $result);
-        $newFirstData = $this->fetchTestData($firstId);
-        $newSecondData = $this->fetchTestData($secondId);
+        $newFirstData = $this->fetchTestData('books', $firstId);
+        $newSecondData = $this->fetchTestData('books', $secondId);
         $this->assertEquals(
             $newData->jsonSerialize()['title'],
             $newSecondData['title']
@@ -154,7 +154,7 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
     {
         $testRow = ['title' => 'ert'];
         $insertId = $this->insertTestData($testRow);
-        $rowCountBeforeDeletion = count($this->fetchTestData(null, 'fetchAll'));
+        $rowCountBeforeDeletion = count($this->fetchTestData('books', null, null, 'fetchAll'));
         $this->assertGreaterThan(0, $rowCountBeforeDeletion);
         // Execute
         $filterApplier = function ($deleteQueryRef) use ($insertId) {
@@ -165,8 +165,8 @@ class QueryBuildingDbTests extends InMemoryPDOTestCase
         // Assert
         $expectedRowCount = 1;
         $this->assertEquals($expectedRowCount, $result);
-        $this->assertEmpty($this->fetchTestData($insertId));
-        $rowCountAfterDeletion = count($this->fetchTestData(null, 'fetchAll'));
+        $this->assertEmpty($this->fetchTestData('books', $insertId));
+        $rowCountAfterDeletion = count($this->fetchTestData('books', null, null, 'fetchAll'));
         $this->assertEquals($rowCountBeforeDeletion - 1, $rowCountAfterDeletion);
     }
 }

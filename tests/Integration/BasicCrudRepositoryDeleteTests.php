@@ -25,8 +25,8 @@ trait BasicCrudRepositoryDeleteTests
         );
         // Assert
         $this->assertEquals(1, $rowCount);
-        $this->assertEmpty($this->fetchTestData($id));
-        $this->assertNotEmpty($this->fetchTestData($id2));
+        $this->assertEmpty($this->fetchTestData('books', $id));
+        $this->assertNotEmpty($this->fetchTestData('books', $id2));
     }
 
     public function testDeleteDeletesSingleItemUsingDefaultFilters()
@@ -42,7 +42,7 @@ trait BasicCrudRepositoryDeleteTests
         $rowCount = $this->bookRepository->delete(['id' => $id2]);
         // Assert
         $this->assertEquals(1, $rowCount);
-        $this->assertEmpty($this->fetchTestData($id2));
-        $this->assertNotEmpty($this->fetchTestData($id));
+        $this->assertEmpty($this->fetchTestData('books', $id2));
+        $this->assertNotEmpty($this->fetchTestData('books', $id));
     }
 }

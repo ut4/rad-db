@@ -17,7 +17,7 @@ trait BasicCrudRepositoryInsertTests
         $insertId = $this->bookRepository->insert($data);
         // Assert
         $this->assertGreaterThan(0, $insertId, 'Should return the insertId');
-        $inserted = $this->fetchTestData($insertId);
+        $inserted = $this->fetchTestData('books', $insertId);
         $this->assertNotEquals($data['id'], $inserted['id']);
         $this->assertEquals($data['title'], $inserted['title']);
         $this->assertEquals($data['pagecount'], $inserted['pagecount']);
@@ -41,7 +41,7 @@ trait BasicCrudRepositoryInsertTests
         $insertId = $this->bookRepository->insert($data);
         // Assert
         $this->assertGreaterThan(0, $insertId, 'Should return the insertId');
-        $inserted = $this->fetchTestData(null, 'fetchAll');
+        $inserted = $this->fetchTestData('books', null, null, 'fetchAll');
         foreach ([0, 1] as $i) {
             $this->assertNotEquals($data[$i]['id'], $inserted[$i]['id']);
             $this->assertEquals($data[$i]['title'], $inserted[$i]['title']);
