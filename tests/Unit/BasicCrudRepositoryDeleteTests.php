@@ -11,7 +11,7 @@ trait BasicCrudRepositoryDeleteTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('delete')
-            ->with($this->bookRepository->getTableName(), $where)
+            ->with($this->bookMappingInstructor->getTableName(), $where)
             ->willReturn($mockRowCountFromDb);
         // Execute
         $result = $this->bookRepository->delete([], $where);

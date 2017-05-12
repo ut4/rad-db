@@ -14,7 +14,7 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->bookRepository->getTableName(), $columns)
+            ->with($this->bookMappingInstructor->getTableName(), $columns)
             ->willReturn($mockRowsFromDb);
         $this->mockMapper
             ->expects($this->once())
@@ -41,7 +41,7 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->bookRepository->getTableName(), $someKeys);
+            ->with($this->bookMappingInstructor->getTableName(), $someKeys);
         // Execute & Assert
         $this->bookRepository->selectAll();
     }
@@ -55,7 +55,7 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->bookRepository->getTableName(), $columns, $where)
+            ->with($this->bookMappingInstructor->getTableName(), $columns, $where)
             ->willReturn($mockRowsFromDb);
         $this->mockMapper
             ->expects($this->once())
@@ -82,7 +82,7 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectAll')
-            ->with($this->bookRepository->getTableName(), $someKeys);
+            ->with($this->bookMappingInstructor->getTableName(), $someKeys);
         // Execute & Assert
         $where = function () {};
         $this->bookRepository->findAll($where);
@@ -97,7 +97,7 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectOne')
-            ->with($this->bookRepository->getTableName(), $columns, $where)
+            ->with($this->bookMappingInstructor->getTableName(), $columns, $where)
             ->willReturn($mockRowFromDb);
         $this->mockMapper
             ->expects($this->once())
@@ -124,7 +124,7 @@ trait BasicCrudRepositorySelectTests
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('selectOne')
-            ->with($this->bookRepository->getTableName(), $someKeys);
+            ->with($this->bookMappingInstructor->getTableName(), $someKeys);
         // Execute & Assert
         $where = function () {};
         $this->bookRepository->findOne($where);

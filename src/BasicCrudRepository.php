@@ -5,12 +5,16 @@ namespace Rad\Db;
 use JsonSerializable;
 use Aura\SqlQuery\QueryInterface;
 
-abstract class BasicCrudRepository implements Repository, Mappable
+abstract class BasicCrudRepository implements Repository
 {
     /**
      * @var QueryBuildingDb
      */
     private $queryBuildingDb;
+    /**
+     * @var Mappable
+     */
+    private $mappingInstructor;
     /**
      * @var Mapper
      */
@@ -25,34 +29,17 @@ abstract class BasicCrudRepository implements Repository, Mappable
         Mapper $mapper = null
     ) {
         $this->queryBuildingDb = $queryBuildingDb;
-        $this->mapper = $mapper ?? new BasicMapper($this->getEntityClassPath());
+        $instructorClassPath = $this->getMapInstructorClassPath();
+        if (!is_subclass_of($instructorClassPath, Mappable::class)) {
+            throw new InvalidArgumentException(
+                $instructorClassPath . ' should implement \\Rad\\Db\\Mappable'
+            );
+        }
+        $this->mappingInstructor = new $instructorClassPath();
+        $this->mapper = $mapper ?? new BasicMapper($this->mappingInstructor->getEntityClassPath());
     }
 
-    /**
-     * @return string
-     */
-    public abstract function getTableName(): string;
-
-    /**
-     * @return string
-     */
-    public abstract function getEntityClassPath(): string;
-
-    /**
-     * @return string
-     */
-    public function getIdColumnName(): string
-    {
-        return 'id';
-    }
-
-    /**
-     * @return BindHint[]
-     */
-    public function getBindHints(): array
-    {
-        return [];
-    }
+    public abstract function getMapInstructorClassPath(): string;
 
     /**
      * @param array|array[] $data
@@ -65,8 +52,8 @@ abstract class BasicCrudRepository implements Repository, Mappable
             return $this->insertMany($data, $bindHints);
         }
         return $this->queryBuildingDb->insert(
-            $this->getTableName(),
-            $this->mapper->map($data, [$this->getIdColumnName()], $bindHints)
+            $this->mappingInstructor->getTableName(),
+            $this->mapper->map($data, [$this->mappingInstructor->getIdColumnName()], $bindHints)
         );
     }
 
@@ -78,8 +65,8 @@ abstract class BasicCrudRepository implements Repository, Mappable
     public function insertMany(array $data, array $bindHints = null): int
     {
         return $this->queryBuildingDb->insertMany(
-            $this->getTableName(),
-            $this->mapper->mapAll($data, [$this->getIdColumnName()])
+            $this->mappingInstructor->getTableName(),
+            $this->mapper->mapAll($data, [$this->mappingInstructor->getIdColumnName()])
         );
     }
 
@@ -129,7 +116,7 @@ abstract class BasicCrudRepository implements Repository, Mappable
     ) {
         return $this->mapper->{$selectMany ? 'mapAll' : 'map'}(
             $this->queryBuildingDb->{$selectMany ? 'selectAll' : 'selectOne'}(
-                $this->getTableName(),
+                $this->mappingInstructor->getTableName(),
                 $cols ?? $this->mapper->getKeys(),
                 $filterApplier
             )
@@ -151,8 +138,8 @@ abstract class BasicCrudRepository implements Repository, Mappable
             $filterApplier = $this->makeDefaultWhere($input);
         }
         return $this->queryBuildingDb->update(
-            $this->getTableName(),
-            $this->mapper->map($input, [$this->getIdColumnName()]),
+            $this->mappingInstructor->getTableName(),
+            $this->mapper->map($input, [$this->mappingInstructor->getIdColumnName()]),
             $filterApplier
         );
     }
@@ -168,7 +155,7 @@ abstract class BasicCrudRepository implements Repository, Mappable
             $filterApplier = $this->makeDefaultWhere($input);
         }
         return $this->queryBuildingDb->delete(
-            $this->getTableName(),
+            $this->mappingInstructor->getTableName(),
             $filterApplier
         );
     }
@@ -180,7 +167,7 @@ abstract class BasicCrudRepository implements Repository, Mappable
     private function makeDefaultWhere(array $input): Callable
     {
         return function (QueryInterface $q) use ($input) {
-            $idCol = $this->getIdColumnName();
+            $idCol = $this->mappingInstructor->getIdColumnName();
             $q->where($idCol . ' = :idVal');
             $q->bindValue(
                 'idVal',

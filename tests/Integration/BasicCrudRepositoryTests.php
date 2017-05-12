@@ -4,7 +4,7 @@ namespace Rad\Db\Integration;
 
 use Rad\Db\Db;
 use Rad\Db\QueryBuildingDb;
-use Rad\Db\Resources\BookRepository;
+use Rad\Db\Resources\BasicBookRepository;
 
 class BasicCrudRepositoryTests extends InMemoryPDOTestCase
 {
@@ -21,12 +21,12 @@ class BasicCrudRepositoryTests extends InMemoryPDOTestCase
      */
     public function beforeEach()
     {
-        parent::beforeEach(true);
+        parent::beforeEach();
         $this->queryBuildingDb = new QueryBuildingDb(
             new Db($this->connection),
             $this->queryFactory
         );
-        $this->bookRepository = new BookRepository(
+        $this->bookRepository = new BasicBookRepository(
             $this->queryBuildingDb
         );
     }

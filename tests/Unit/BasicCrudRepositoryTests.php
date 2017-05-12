@@ -5,7 +5,8 @@ namespace Rad\Db\Unit;
 use PHPUnit\Framework\TestCase;
 use Rad\Db\QueryBuildingDb;
 use Rad\Db\BasicMapper;
-use Rad\Db\Resources\BookRepository;
+use Rad\Db\Resources\BasicBookRepository;
+use Rad\Db\Resources\BookMappings;
 
 class BasicCrudRepositoryTests extends TestCase
 {
@@ -16,6 +17,7 @@ class BasicCrudRepositoryTests extends TestCase
 
     private $mockQueryBuildingDb;
     private $mockMapper;
+    private $bookMappingInstructor;
     private $bookRepository;
 
     /**
@@ -25,7 +27,8 @@ class BasicCrudRepositoryTests extends TestCase
     {
         $this->mockQueryBuildingDb = $this->createMock(QueryBuildingDb::class);
         $this->mockMapper = $this->createMock(BasicMapper::class);
-        $this->bookRepository = new BookRepository(
+        $this->bookMappingInstructor = new BookMappings();
+        $this->bookRepository = new BasicBookRepository(
             $this->mockQueryBuildingDb,
             $this->mockMapper
         );
