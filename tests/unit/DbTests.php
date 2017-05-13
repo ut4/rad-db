@@ -10,7 +10,7 @@ use Aura\SqlQuery\Common\SelectInterface;
 use Aura\SqlQuery\Common\UpdateInterface;
 use Aura\SqlQuery\Common\DeleteInterface;
 
-class DbTest extends TestCase
+class DbTests extends TestCase
 {
     private $mockConn;
     private $db;

@@ -2,9 +2,10 @@
 
 namespace Rad\Db\Resources;
 
+use Rad\Db\Mappable;
 use Rad\Db\Resources\Book;
 use Rad\Db\BindHint\OneToMany;
-use Rad\Db\Mappable;
+use Rad\Db\Resources\NoteMappings;
 
 class BookMappings implements Mappable
 {
@@ -20,7 +21,7 @@ class BookMappings implements Mappable
 
     public function getBindHints(): array
     {
-        return [new OneToMany('notes', NoteMapInstructor::class)];
+        return [new OneToMany('notes', NoteMappings::class)];
     }
 
     public function getIdColumnName(): string
