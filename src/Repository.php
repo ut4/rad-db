@@ -13,31 +13,21 @@ interface Repository
     public function insert(array $data): int;
 
     /**
-     * @param array $cols = null
      * @return JsonSerializable[]
      */
-    public function selectAll(array $cols = null): array;
+    public function selectAll(): array;
 
     /**
      * @param Callable $filterApplier TODO change to Aura\SqlQuery\Common\WhereInterface
-     * @param array $cols = null
      * @return JsonSerializable[]
      */
-    public function findAll(
-        Callable $filterApplier,
-        array $cols = null
-    ): array;
+    public function findAll(Callable $filterApplier): array;
 
     /**
      * @param Callable $filterApplier TODO change to Aura\SqlQuery\Common\WhereInterface
-     * @param array $cols = null
      * @return JsonSerializable
      */
-    public function findOne(
-        Callable $filterApplier,
-        array $cols = null
-    ): JsonSerializable;
-
+    public function findOne(Callable $filterApplier): JsonSerializable;
 
     /**
      * @param array $input

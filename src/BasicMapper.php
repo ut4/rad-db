@@ -35,8 +35,8 @@ class BasicMapper implements Mapper
             if ($omit && in_array($name, $omit)) {
                 continue;
             }
-            // Value has no setter -> do nothing
             $setterMethodName = 'set' . ucfirst($name);
+            // Value has no setter -> do nothing
             if (!method_exists($entity, $setterMethodName)) {
                 continue;
             }

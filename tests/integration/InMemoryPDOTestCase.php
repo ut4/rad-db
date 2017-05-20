@@ -26,17 +26,19 @@ class InMemoryPDOTestCase extends TestCase
     }
 
     /**
-     * Inserts $data to books
+     * Inserts $data to $tableName, example $data = ['key' => 'val', 'key2' => 'val2']
      */
-    protected function insertTestData(array $data): int
-    {
+    protected function insertTestData(
+        array $data,
+        string $tableName = 'books'
+    ): int {
         $insertQuery = $this->queryFactory->newInsert();
-        $insertQuery->into('books')->cols($data);
+        $insertQuery->into($tableName)->cols($data);
         return $this->connection->insert($insertQuery);
     }
 
     /**
-     * Fetches data from books where id = $id using PDOStatement->$method
+     * Fetches data from $tableName where id = $whereExprOrId or ... $whereExprOrId using PDOStatement->$method
      */
     protected function fetchTestData(
         string $tableName,
