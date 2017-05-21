@@ -4,14 +4,29 @@ namespace Rad\Db\Integration;
 
 use Rad\Db\Db;
 use Rad\Db\QueryBuildingDb;
-use Rad\Db\HintQueryRunner;
+use Rad\Db\Planner;
+use Rad\Db\PlanExecutor;
 use Rad\Db\Resources\AutoBookRepository;
 
 class AutoRepositoryTests extends InMemoryPDOTestCase
 {
     private $queryBuildingDb;
-    private $hintQueryRunner;
     private $bookRepository;
+    private $testInputData = [
+        'title' => 'fos',
+        'pagecount' => '24',
+        'notes' => [
+            [
+                'content' => 'a text'
+            ],
+            [
+                'content' => 'rt'
+            ]
+        ],
+        // these should be ignored
+        'id' => '0',
+        'junk' => 'qwe'
+    ];
 
     /**
      * @before
@@ -23,30 +38,15 @@ class AutoRepositoryTests extends InMemoryPDOTestCase
             new Db($this->connection),
             $this->queryFactory
         );
-        $this->hintQueryRunner = new HintQueryRunner();
         $this->bookRepository = new AutoBookRepository(
-            $this->hintQueryRunner,
-            $this->queryBuildingDb
+            new Planner(),
+            new PlanExecutor($this->queryBuildingDb)
         );
     }
 
     public function testInsertMapsAndInsertsOneToManyHintedItems()
     {
-        $data = [
-            'title' => 'fos',
-            'pagecount' => '24',
-            'notes' => [
-                [
-                    'content' => 'a text'
-                ],
-                [
-                    'content' => 'rt'
-                ]
-            ],
-            // these should be ignored
-            'id' => '0',
-            'junk' => 'qwe'
-        ];
+        $data = $this->testInputData;
         // Execute
         $insertId = $this->bookRepository->insert($data);
         // Assert

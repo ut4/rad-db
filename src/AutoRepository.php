@@ -3,103 +3,50 @@
 namespace Rad\Db;
 
 use JsonSerializable;
-use InvalidArgumentException;
+use Rad\Db\Executor\InsertExecutor;
 
 abstract class AutoRepository implements Repository
 {
-    private $hintQueryRunner;
-    private $queryBuildingDb;
-    private $mapper;
-    private $rootMapInstructor;
-
-    /**
-     * @param HintQueryRunner $hintQueryRunner
-     * @param QueryBuildingDb $queryBuildingDb
-     * @param Mapper $mapper = null
-     */
     public function __construct(
-        HintQueryRunner $hintQueryRunner,
-        QueryBuildingDb $queryBuildingDb,
-        Mapper $mapper = null
+        Planner $planner,
+        PlanExecutor $planExecutor
     ) {
-        $this->hintQueryRunner = $hintQueryRunner;
-        $this->queryBuildingDb = $queryBuildingDb;
-        $instructorClassPath = $this->getMapInstructorClassPath();
-        if (!\is_subclass_of($instructorClassPath, Mappable::class)) {
-            throw new InvalidArgumentException(
-                $instructorClassPath . ' should implement \\Rad\\Db\\Mappable'
-            );
-        }
-        $this->rootMapInstructor = new $instructorClassPath();
-        $this->mapper = $mapper ?? new BasicMapper($this->rootMapInstructor->getEntityClassPath());
+        $this->planner = $planner;
+        $cp = $this->getMapInstructorClassPath();
+        $this->rootMapInstructor = new $cp();
+        $this->planExecutor = $planExecutor;
     }
 
     public abstract function getMapInstructorClassPath(): string;
 
-    /**
-     * @param array|array[] $data
-     * @param BindHint[] $bindHints = null
-     * @return int
-     */
-    public function insert(array $data, array $bindHints = null): int
+    public function insert(array $data): int
     {
-        $mainQ = new QueryPacket($data, $this->rootMapInstructor);
-        if (($mainResult = $this->execInsert($mainQ)) < 1) {
-            return $mainResult;
-        }
-        $mainQ->setResult($mainResult);
-        if ($this->rootMapInstructor->getBindHints()) {
-            $result = $this->hintQueryRunner->run($mainQ, [$this, 'execInsert']);
-            if ($result < 1) {
-                return $result;
-            }
-        }
-        return $mainResult;
+        $planParts = $this->planner->makeQueryPlan($data, $this->rootMapInstructor);
+        return $this->planExecutor->executeQueryPlan($planParts, new InsertExecutor(new Mapper()));
     }
 
-    /**
-     * @param QueryPacket $insertQuery
-     * @return int
-     */
-    public function execInsert(QueryPacket $insertQuery): int
+    public function selectAll(): array
     {
-        $instructions = $insertQuery->getMapInstructor();
-        return $this->queryBuildingDb->insertMany(
-            $instructions->getTableName(),
-            $this->mapper->mapAll(
-                isset($insertQuery->getData()[0])
-                    ? $insertQuery->getData()
-                    : [$insertQuery->getData()],
-                [$instructions->getIdColumnName()],
-                $instructions->getEntityClassPath()
-            )
-        );
+        throw new Exception('not implemented yet');
     }
 
-    public function findAll(Callable $filterApplier, array $cols = null): array
+    public function findAll(Callable $filterApplier): array
     {
-        throw new \Exception('Not implemented');
+        throw new Exception('not implemented yet');
     }
 
-    public function findOne(
-        Callable $filterApplier,
-        array $cols = null
-    ): JsonSerializable {
-        throw new \Exception('Not implemented');
-    }
-
-    public function selectAll(array $cols = null): array
+    public function findOne(Callable $filterApplier): JsonSerializable
     {
-        throw new \Exception('Not implemented');
-    }
-
-    public function delete(array $input): int
-    {
-        throw new \Exception('Not implemented');
+        throw new Exception('not implemented yet');
     }
 
     public function update(array $input): int
     {
-        throw new \Exception('Not implemented');
+        throw new Exception('not implemented yet');
+    }
+
+    public function delete(array $input): int
+    {
+        throw new Exception('not implemented yet');
     }
 }

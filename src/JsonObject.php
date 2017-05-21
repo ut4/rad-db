@@ -7,8 +7,8 @@ use JsonSerializable;
 class JsonObject implements JsonSerializable
 {
     /**
-     * Otherwise we have no idea which properties should be serialized when
-     * jsonSerialize is triggered by json_encode.
+     * Otherwise we have no idea which properties should be included to the
+     * output of jsonSerialize when its triggered by json_encode (or manually).
      */
     protected $mappedProps = [];
     protected $propsToOmit;
@@ -23,7 +23,8 @@ class JsonObject implements JsonSerializable
             if ($this->propsToOmit && in_array($propName, $this->propsToOmit)) {
                 continue;
             }
-            $out[$propName] = $this->{'get' . ucfirst($propName)}();
+            $getterName = 'get' . ucfirst($propName);
+            $out[$propName] = method_exists($this, $getterName) ? $this->$getterName() : $this->$propName;
         }
         return $out;
     }
