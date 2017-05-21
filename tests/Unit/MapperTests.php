@@ -3,39 +3,16 @@
 namespace Rad\Db\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Rad\Db\BasicMapper;
+use Rad\Db\Mapper;
 use Rad\Db\Resources\Book;
 use Rad\Db\Resources\Note;
 
-class BasicMapperTests extends TestCase
+class MapperTests extends TestCase
 {
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testConstructThrowsIfEntityClassPathIsNotValid()
-    {
-        new BasicMapper('stdClass');
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testEntityClassPathSetterThrowsIfNewValueIsNotValid()
-    {
-        $mapper = new BasicMapper(Book::class);
-        $mapper->setEntityClassPath('stdClass');
-    }
-
-    public function testMapWithADifferentEntityClassPath()
-    {
-        $mapper = new BasicMapper(Book::class);
-        $this->assertInstanceof(Note::class, $mapper->map([], null, Note::class));
-    }
-
     public function testMapInstantiatesAndMapsDataToEntityClass()
     {
         $input = ['title' => 'a value', 'pagecount' => 45];
-        $mapper = new BasicMapper(Book::class);
+        $mapper = new Mapper(Book::class);
         // Execute
         $result = $mapper->map($input);
         // Assert
@@ -47,7 +24,7 @@ class BasicMapperTests extends TestCase
     public function testMapUsesSettersToMapValues()
     {
         $input = ['title' => 'a value', 'pagecount' => '45', 'junk' => 'afo'];
-        $mapper = new BasicMapper(Book::class);
+        $mapper = new Mapper(Book::class);
         // Execute
         $result = $mapper->map($input);
         // Assert
@@ -62,7 +39,7 @@ class BasicMapperTests extends TestCase
     public function testMapMarksAllSetPropertiesAsSet()
     {
         $input = ['title' => 'a value', 'pagecount' => '45', 'junk' => 'afo'];
-        $mapper = new BasicMapper(Book::class);
+        $mapper = new Mapper(Book::class);
         // Execute
         $result = $mapper->map($input);
         // Assert
@@ -74,9 +51,9 @@ class BasicMapperTests extends TestCase
     public function testMapSetsOmitListToMappedItem()
     {
         $omitList = ['id'];
-        $mapper = new BasicMapper(Book::class);
+        $mapper = new Mapper(Book::class);
         // Execute & Assert
-        $result = $mapper->map(['somedata' =>'afoo'], $omitList);
+        $result = $mapper->map(['somedata' =>'afoo'], null, $omitList);
         // Hackssert
         $property = (new \ReflectionObject($result))->getProperty('propsToOmit');
         $property->setAccessible(true);
@@ -89,7 +66,7 @@ class BasicMapperTests extends TestCase
             ['title' => 'a value', 'pagecount' => 45],
             ['title' => 'a valyr', 'pagecount' => 46]
         ];
-        $mapper = new BasicMapper(Book::class);
+        $mapper = new Mapper(Book::class);
         // Execute
         $results = $mapper->mapAll($inputs);
         // Assert
@@ -105,7 +82,7 @@ class BasicMapperTests extends TestCase
     public function testMapAllAlwaysReturnsAnArrayOfMappedItems()
     {
         $inputs = ['title' => 'a value', 'pagecount' => 45];
-        $mapper = new BasicMapper(Book::class);
+        $mapper = new Mapper(Book::class);
         // Execute
         $results = $mapper->mapAll($inputs);
         // Assert
@@ -117,7 +94,7 @@ class BasicMapperTests extends TestCase
 
     public function testMapAllReturnsEmptyArrayIfTheresNothingToMap()
     {
-        $mapper = new BasicMapper(Book::class);
+        $mapper = new Mapper(Book::class);
         // Execute
         $results = $mapper->mapAll([]);
         // Assert
@@ -126,10 +103,19 @@ class BasicMapperTests extends TestCase
 
     public function testGetKeysCollectsKeysFromSetters()
     {
-        $mapper = new BasicMapper(Book::class);
+        $mapper = new Mapper(Book::class);
         // Execute
         $result = $mapper->getKeys();
         // Assert
         $this->assertEquals(['id', 'title', 'pagecount'], $result);
+    }
+
+    public function testGetKeysWithADifferentEntityClassPath()
+    {
+        $mapper = new Mapper(Book::class);
+        // Execute
+        $result = $mapper->getKeys(Note::class);
+        // Assert
+        $this->assertEquals(['id', 'content', 'booksId'], $result);
     }
 }

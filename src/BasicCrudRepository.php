@@ -14,7 +14,7 @@ abstract class BasicCrudRepository implements Repository
     /**
      * @var Mappable
      */
-    private $mappingInstructor;
+    private $mapInstructor;
     /**
      * @var Mapper
      */
@@ -35,8 +35,8 @@ abstract class BasicCrudRepository implements Repository
                 $instructorClassPath . ' should implement \\Rad\\Db\\Mappable'
             );
         }
-        $this->mappingInstructor = new $instructorClassPath();
-        $this->mapper = $mapper ?? new BasicMapper($this->mappingInstructor->getEntityClassPath());
+        $this->mapInstructor = new $instructorClassPath();
+        $this->mapper = $mapper ?? new Mapper($this->mapInstructor->getEntityClassPath());
     }
 
     public abstract function getMapInstructorClassPath(): string;
@@ -52,8 +52,8 @@ abstract class BasicCrudRepository implements Repository
             return $this->insertMany($data, $bindHints);
         }
         return $this->queryBuildingDb->insert(
-            $this->mappingInstructor->getTableName(),
-            $this->mapper->map($data, [$this->mappingInstructor->getIdColumnName()], $bindHints)
+            $this->mapInstructor->getTableName(),
+            $this->mapper->map($data, null, [$this->mapInstructor->getIdColumnName()], $bindHints)
         );
     }
 
@@ -65,8 +65,8 @@ abstract class BasicCrudRepository implements Repository
     public function insertMany(array $data, array $bindHints = null): int
     {
         return $this->queryBuildingDb->insertMany(
-            $this->mappingInstructor->getTableName(),
-            $this->mapper->mapAll($data, [$this->mappingInstructor->getIdColumnName()])
+            $this->mapInstructor->getTableName(),
+            $this->mapper->mapAll($data, null, [$this->mapInstructor->getIdColumnName()])
         );
     }
 
@@ -116,7 +116,7 @@ abstract class BasicCrudRepository implements Repository
     ) {
         return $this->mapper->{$selectMany ? 'mapAll' : 'map'}(
             $this->queryBuildingDb->{$selectMany ? 'selectAll' : 'selectOne'}(
-                $this->mappingInstructor->getTableName(),
+                $this->mapInstructor->getTableName(),
                 $cols ?? $this->mapper->getKeys(),
                 $filterApplier
             )
@@ -138,8 +138,8 @@ abstract class BasicCrudRepository implements Repository
             $filterApplier = $this->makeDefaultWhere($input);
         }
         return $this->queryBuildingDb->update(
-            $this->mappingInstructor->getTableName(),
-            $this->mapper->map($input, [$this->mappingInstructor->getIdColumnName()]),
+            $this->mapInstructor->getTableName(),
+            $this->mapper->map($input, null, [$this->mapInstructor->getIdColumnName()]),
             $filterApplier
         );
     }
@@ -155,7 +155,7 @@ abstract class BasicCrudRepository implements Repository
             $filterApplier = $this->makeDefaultWhere($input);
         }
         return $this->queryBuildingDb->delete(
-            $this->mappingInstructor->getTableName(),
+            $this->mapInstructor->getTableName(),
             $filterApplier
         );
     }
@@ -167,7 +167,7 @@ abstract class BasicCrudRepository implements Repository
     private function makeDefaultWhere(array $input): Callable
     {
         return function (QueryInterface $q) use ($input) {
-            $idCol = $this->mappingInstructor->getIdColumnName();
+            $idCol = $this->mapInstructor->getIdColumnName();
             $q->where($idCol . ' = :idVal');
             $q->bindValue(
                 'idVal',

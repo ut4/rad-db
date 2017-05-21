@@ -10,19 +10,19 @@ trait BasicCrudRepositoryUpdateTests
     {
         $input = ['foo' => 'bar'];
         $where = function () {};
-        $expectedOmitList = [$this->bookMappingInstructor->getIdColumnName()];
+        $expectedOmitList = [$this->bookMapInstructor->getIdColumnName()];
         $bindHints = [];
         $mockMappedData = new JsonObject();
         $this->mockMapper
             ->expects($this->once())
             ->method('map')
-            ->with($input, $expectedOmitList)
+            ->with($input, null, $expectedOmitList)
             ->willReturn($mockMappedData);
         $mockRowCountFromDb = 1;
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('update')
-            ->with($this->bookMappingInstructor->getTableName(), $mockMappedData, $where)
+            ->with($this->bookMapInstructor->getTableName(), $mockMappedData, $where)
             ->willReturn($mockRowCountFromDb);
         // Execute
         $result = $this->bookRepository->update($input, $where, $bindHints);

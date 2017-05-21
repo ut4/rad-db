@@ -10,17 +10,17 @@ trait BasicCrudRepositoryInsertTests
     {
         $input = ['foo' => 'bar'];
         $mockMappedItem = new JsonObject();
-        $expectedOmitList = [$this->bookMappingInstructor->getIdColumnName()];
+        $expectedOmitList = [$this->bookMapInstructor->getIdColumnName()];
         $this->mockMapper
             ->expects($this->once())
             ->method('map')
-            ->with($input, $expectedOmitList)
+            ->with($input, null, $expectedOmitList)
             ->willReturn($mockMappedItem);
         $mockInsertIdFromDb = 1;
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('insert')
-            ->with($this->bookMappingInstructor->getTableName(), $mockMappedItem)
+            ->with($this->bookMapInstructor->getTableName(), $mockMappedItem)
             ->willReturn($mockInsertIdFromDb);
         // Execute
         $result = $this->bookRepository->insert($input);
@@ -40,17 +40,17 @@ trait BasicCrudRepositoryInsertTests
         ];
         $bindHints = ['foo.haz' => '<AnotherEntityClass>'];
         $mockMappedItems = [new JsonObject(), new JsonObject()];
-        $expectedOmitList = [$this->bookMappingInstructor->getIdColumnName()];
+        $expectedOmitList = [$this->bookMapInstructor->getIdColumnName()];
         $this->mockMapper
             ->expects($this->once())
             ->method('mapAll')
-            ->with($inputs, $expectedOmitList)
+            ->with($inputs, null, $expectedOmitList)
             ->willReturn($mockMappedItems);
         $mockInsertIdFromDb = 2;
         $this->mockQueryBuildingDb
             ->expects($this->once())
             ->method('insertMany')
-            ->with($this->bookMappingInstructor->getTableName(), $mockMappedItems)
+            ->with($this->bookMapInstructor->getTableName(), $mockMappedItems)
             ->willReturn($mockInsertIdFromDb);
         // Execute
         $result = $this->bookRepository->insert($inputs, $bindHints);
