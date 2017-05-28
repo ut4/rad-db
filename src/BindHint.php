@@ -2,28 +2,40 @@
 
 namespace Rad\Db;
 
+use InvalidArgumentException;
+
 class BindHint
 {
+    const TYPES = ['HasMany' => 'HasMany'];
+
     private $targetPropertyName;
-    private $queryPartClassPath;
+    private $bindType;
     private $instructorClassPath;
+    private $originIdCol;
 
     public function __construct(
+        string $bindType,
         string $targetPropertyName,
-        string $queryPartClassPath,
         string $instructorClassPath
     ) {
+        if (!array_key_exists($bindType, static::TYPES)) {
+            throw new InvalidArgumentException(sprintf(
+                'Bint type %s not implemented. Available types: %s',
+                $bindType,
+                \implode(', ', \array_keys(static::TYPES))
+            ));
+        }
+        $this->bindType = static::TYPES[$bindType];
         $this->targetPropertyName = $targetPropertyName;
-        $this->queryPartClassPath = $queryPartClassPath;
         $this->instructorClassPath = $instructorClassPath;
     }
 
     /**
      * @return string
      */
-    public function getQueryPartClassPath(): string
+    public function getBindType(): string
     {
-        return $this->queryPartClassPath;
+        return $this->bindType;
     }
 
     /**
@@ -40,5 +52,18 @@ class BindHint
     public function getMapInstructorClassPath(): string
     {
         return $this->instructorClassPath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOriginIdCol(): string
+    {
+        return $this->originIdCol;
+    }
+
+    public function setOriginIdCol(string $originIdCol)
+    {
+        $this->originIdCol = $originIdCol;
     }
 }

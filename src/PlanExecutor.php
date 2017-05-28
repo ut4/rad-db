@@ -2,6 +2,8 @@
 
 namespace Rad\Db;
 
+use Aura\SqlQuery\Common\SelectInterface;
+
 class PlanExecutor
 {
     private $db;
@@ -14,12 +16,14 @@ class PlanExecutor
     /**
      * @return int
      */
-    public function executeQueryPlan(array $planParts, Executor $executor): int
-    {
+    public function executeQueryPlan(
+        array $planParts,
+        QueryExecutor $executor
+    ): int {
         $previous = null;
         // start transaction here ...
         foreach ($planParts as $planPart) {
-            if ($planPart instanceof PreProcessableQueryPart) {
+            if ($planPart instanceof PreProcessableQueryPlanPart) {
                 $planPart->preProcess($previous);
             }
             $planPart->result = $executor->exec($planPart, $this->db);
@@ -33,8 +37,26 @@ class PlanExecutor
         return $planParts[0]->result;
     }
 
-    public function executeFetchPlan(array $planParts)
+    /**
+     * @return array
+     */
+    public function executeFetchPlan(
+        array $planParts,
+        SelectInterface $select
+    ): array {
+        $fetchResults = $this->db->selectAll($select);
+        $mapped = [];
+        // Main rows, level 0
+        $planParts[0]->collect($fetchResults, $mapped);
+        // Hinted rows, level 1+
+        while ($planPart = \next($planParts)) {
+            $planPart->collect($fetchResults, $mapped);
+        }
+        return $mapped;
+    }
+
+    public function newSelect()
     {
-        throw new Exception('no implemented yet');
+        return $this->db->getQueryFactory()->newSelect();
     }
 }

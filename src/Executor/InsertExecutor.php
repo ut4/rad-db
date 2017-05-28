@@ -2,12 +2,12 @@
 
 namespace Rad\Db\Executor;
 
-use Rad\Db\Executor;
+use Rad\Db\QueryExecutor;
 use Rad\Db\Mapper;
-use Rad\Db\QueryPart;
+use Rad\Db\QueryPlanPart;
 use Rad\Db\QueryBuildingDb;
 
-class InsertExecutor implements Executor
+class InsertExecutor implements QueryExecutor
 {
     private $mapper;
 
@@ -16,24 +16,24 @@ class InsertExecutor implements Executor
         $this->mapper = $mapper;
     }
 
-    public function exec(QueryPart $qp, QueryBuildingDb $db): int
+    /**
+     * @return int lastInsertId
+     */
+    public function exec(QueryPlanPart $qpp, QueryBuildingDb $db): int
     {
-        if (isset($qp->getData()[0])) {
-            return $db->insertMany(
-                $qp->getMapInstructor()->getTableName(),
-                $this->mapper->mapAll(
-                    $qp->getData(),
-                    $qp->getMapInstructor()->getEntityClassPath(),
-                    [$qp->getMapInstructor()->getIdColumnName()]
-                )
-            );
+        if (isset($qpp->getData()[0])) {
+            $dbMethod = 'insertMany';
+            $mapMethod = 'mapAll';
+        } else {
+            $dbMethod = 'insert';
+            $mapMethod = 'map';
         }
-        return $db->insert(
-            $qp->getMapInstructor()->getTableName(),
-            $this->mapper->map(
-                $qp->getData(),
-                $qp->getMapInstructor()->getEntityClassPath(),
-                [$qp->getMapInstructor()->getIdColumnName()]
+        return $db->$dbMethod(
+            $qpp->getMapInstructor()->getTableName(),
+            $this->mapper->$mapMethod(
+                $qpp->getData(),
+                $qpp->getMapInstructor()->getEntityClassPath(),
+                [$qpp->getMapInstructor()->getIdColumnName()]
             )
         );
     }

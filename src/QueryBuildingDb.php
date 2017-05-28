@@ -241,6 +241,14 @@ class QueryBuildingDb
     }
 
     /**
+     * @return QueryFactory
+     */
+    public function getQueryFactory(): QueryFactory
+    {
+        return $this->queryFactory;
+    }
+
+    /**
      * @param string $tableName
      * @param Callable $filterApplier
      * @return DeleteInterface

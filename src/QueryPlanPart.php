@@ -2,7 +2,7 @@
 
 namespace Rad\Db;
 
-class QueryPart
+class QueryPlanPart
 {
     protected $data;
     protected $instructor;

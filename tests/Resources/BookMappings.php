@@ -6,7 +6,6 @@ use Rad\Db\Mappable;
 use Rad\Db\Resources\Book;
 use Rad\Db\BindHint;
 use Rad\Db\Resources\NoteMappings;
-use Rad\Db\QueryPart\HasMany;
 
 class BookMappings implements Mappable
 {
@@ -22,7 +21,7 @@ class BookMappings implements Mappable
 
     public function getBindHints(): array
     {
-        return [new BindHint('notes', HasMany::class, NoteMappings::class)];
+        return [new BindHint('HasMany', 'notes', NoteMappings::class)];
     }
 
     public function getIdColumnName(): string
