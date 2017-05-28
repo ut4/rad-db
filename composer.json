@@ -9,6 +9,9 @@
             "Rad\\Db\\": [
                 "src/",
                 "tests/"
+            ],
+            "Demo\\": [
+                "demo/"
             ]
         }
     },
