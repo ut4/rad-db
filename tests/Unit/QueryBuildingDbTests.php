@@ -55,6 +55,8 @@ class QueryBuildingDbTests extends TestCase
         );
     }
 
+    // TODO jsonSerializesRecursively??
+
     /**
      * @expectedException RuntimeException
      */

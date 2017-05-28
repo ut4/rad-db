@@ -15,6 +15,9 @@ class HasManyCollectExecutor extends RootCollectExecutor
         $hint = $fpp->getBindHint();
         $batch = $this->collectBatch($fpp, $fetchResults);
         foreach ($batch as $item) {
+            if (!$item->getId()) { // TODO - what to do with blank rows??
+                continue;
+            }
             $ref = &$this->findParent(
                 $mapped,
                 $item->{'get' . ucfirst($hint->getOriginIdCol())}(),

@@ -31,7 +31,8 @@ class AutoRepositoryTests extends BaseTestCase
         $this->mapper = new Mapper(Book::class);
         $this->bookRepository = new AutoBookRepository(
             $this->queryPlanner,
-            $this->queryPlanExecutor
+            $this->queryPlanExecutor,
+            $this->mapper
         );
     }
 }

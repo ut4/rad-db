@@ -66,7 +66,7 @@ class QueryBuildingDb
     ): InsertInterface {
         $insert = $this->queryFactory->newInsert();
         $insert->into($tableName);
-        $insert->cols($mappedData->jsonSerialize());
+        $insert->cols($this->jsonSerializeRecursively($mappedData));
         return $insert;
     }
 
@@ -92,14 +92,14 @@ class QueryBuildingDb
     /**
      * @param string|Aura\SqlQuery\Common\SelectInterface $tableNameOrQuery
      * @param array $columns = null
-     * @param Callable $filterApplier = null
+     * @param Closure $filterApplier = null
      * @param $fetchArgs = null
      * @param array[]
      */
     public function selectAll(
         $tableNameOrQuery,
         array $columns = null,
-        Callable $filterApplier = null,
+        Closure $filterApplier = null,
         array $fetchArgs = null
     ): array {
         return $this->doSelect(
@@ -114,14 +114,14 @@ class QueryBuildingDb
     /**
      * @param string|Aura\SqlQuery\Common\SelectInterface $tableNameOrQuery
      * @param array $columns
-     * @param Callable $filterApplier = null
+     * @param Closure $filterApplier = null
      * @param $fetchArgs = null
      * @param array
      */
     public function selectOne(
         $tableNameOrQuery,
         array $columns = null,
-        Callable $filterApplier = null,
+        Closure $filterApplier = null,
         array $fetchArgs = null
     ): array {
         return $this->doSelect(
@@ -137,7 +137,7 @@ class QueryBuildingDb
      * @param string $method selectAll or selectOne
      * @param string|Aura\SqlQuery\Common\SelectInterface $tableNameOrQuery
      * @param array $columns
-     * @param Callable $filterApplier = null
+     * @param Closure $filterApplier = null
      * @param $fetchArgs = null
      * @param array
      */
@@ -145,7 +145,7 @@ class QueryBuildingDb
         string $method,
         $tableNameOrQuery,
         array $columns = null,
-        Callable $filterApplier = null,
+        Closure $filterApplier = null,
         array $fetchArgs = null
     ): array {
         return $this->db->$method(
@@ -163,13 +163,13 @@ class QueryBuildingDb
     /**
      * @param string $tableName
      * @param array $columns
-     * @param Callable $filterApplier = null
+     * @param Closure $filterApplier = null
      * @param SelectInterface
      */
     private function makeSelectQuery(
         string $tableName,
         array $columns,
-        Callable $filterApplier = null
+        Closure $filterApplier = null
     ): SelectInterface {
         $select = $this->queryFactory->newSelect();
         $select->from($tableName);
@@ -183,13 +183,13 @@ class QueryBuildingDb
     /**
      * @param string|Aura\SqlQuery\Common\UpdateInterface $tableNameOrQuery
      * @param JsonSerializable $mappedData = null
-     * @param Callable $filterApplier = null
+     * @param Closure $filterApplier = null
      * @return int
      */
     public function update(
         $tableNameOrQuery,
         JsonSerializable $mappedData = null,
-        Callable $filterApplier = null
+        Closure $filterApplier = null
     ): int {
         return $this->db->update(
             ($tableNameOrQuery instanceof UpdateInterface)
@@ -205,15 +205,15 @@ class QueryBuildingDb
     /**
      * @param string $tableName
      * @param JsonSerializable $mappedData
-     * @param Callable $filterApplier = null
+     * @param Closure $filterApplier = null
      * @return UpdateInterface
      */
     private function makeUpdateQuery(
         string $tableName,
         JsonSerializable $mappedData,
-        Callable $filterApplier = null
+        Closure $filterApplier = null
     ): UpdateInterface {
-        $value = $mappedData->jsonSerialize();
+        $value = $this->jsonSerializeRecursively($mappedData);
         $update = $this->queryFactory->newUpdate();
         $update->table($tableName);
         $update->cols(array_keys($value));
@@ -226,12 +226,12 @@ class QueryBuildingDb
 
     /**
      * @param string|Aura\SqlQuery\Common\DeleteInterface $tableNameOrQuery
-     * @param Callable $filterApplier = null
+     * @param Closure $filterApplier = null
      * @return int
      */
     public function delete(
         $tableNameOrQuery,
-        Callable $filterApplier = null
+        Closure $filterApplier = null
     ): int {
         return $this->db->delete(
             ($tableNameOrQuery instanceof DeleteInterface)
@@ -250,12 +250,12 @@ class QueryBuildingDb
 
     /**
      * @param string $tableName
-     * @param Callable $filterApplier
+     * @param Closure $filterApplier
      * @return DeleteInterface
      */
     private function makeDeleteQuery(
         string $tableName,
-        Callable $filterApplier
+        Closure $filterApplier
     ): DeleteInterface {
         $delete = $this->queryFactory->newDelete();
         $delete->from($tableName);
@@ -270,7 +270,6 @@ class QueryBuildingDb
      */
     private function jsonSerializeAll(array $mappedData): array
     {
-        $serialized = [];
         foreach ($mappedData as $item) {
             if (!($item instanceof JsonSerializable)) {
                 throw new UnexpectedValueException(
@@ -278,8 +277,19 @@ class QueryBuildingDb
                     '\\JsonSerializable'
                 );
             }
-            $serialized[] = $item->jsonSerialize();
         }
-        return $serialized;
+        return $this->jsonSerializeRecursively($mappedData);
+    }
+
+    /**
+     * jsonSerialize's all $mappedData values recursively (because
+     * $mapped->jsonSerialize() doesn't do that).
+     *
+     * @param JsonSerializable|JsonSerializable[] $mappedData
+     * @return array[] The encoded result
+     */
+    private function jsonSerializeRecursively($mappedData)
+    {
+        return json_decode(json_encode($mappedData), true);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Rad\Db;
 
+use Closure;
 use JsonSerializable;
 
 interface Repository
@@ -18,16 +19,16 @@ interface Repository
     public function selectAll(): array;
 
     /**
-     * @param Callable $filterApplier TODO change to Aura\SqlQuery\Common\WhereInterface
+     * @param Closure $filterApplier
      * @return JsonSerializable[]
      */
-    public function findAll(Callable $filterApplier): array;
+    public function findAll(Closure $filterApplier): array;
 
     /**
-     * @param Callable $filterApplier TODO change to Aura\SqlQuery\Common\WhereInterface
+     * @param Closure $filterApplier
      * @return JsonSerializable
      */
-    public function findOne(Callable $filterApplier): JsonSerializable;
+    public function findOne(Closure $filterApplier): JsonSerializable;
 
     /**
      * @param array $input
